@@ -1,12 +1,12 @@
 # Chu và Quả Trứng Thất Lạc
 
-## Phiên bản 1.1 — Bản đầu để chơi và điều chỉnh
+## Phiên bản 1.2 — Bản đầu để chơi và điều chỉnh
 Game khám phá 3D low-poly bằng tiếng Việt, dành cho trẻ chơi cùng phụ huynh. Chu đọc truyện khủng long, nhận ra một ngọn núi quen thuộc, xin phép và cùng bố lên đường. Trẻ tập quan sát, giải câu đố, nhận biết tình huống nguy hiểm và nhờ người lớn hỗ trợ.
 
-Bản 1.1 có một hành trình hoàn chỉnh gồm 4 chặng. Thời lượng thiết kế hướng tới khoảng 10–15 phút khi đọc và khám phá; chưa đo thời gian chơi với trẻ thực tế, người chơi biết đáp án có thể hoàn thành nhanh hơn.
+Bản 1.2 có một hành trình hoàn chỉnh gồm 4 chặng. Thời lượng thiết kế hướng tới khoảng 10–15 phút khi đọc và khám phá; chưa đo thời gian chơi với trẻ thực tế, người chơi biết đáp án có thể hoàn thành nhanh hơn.
 
 ## Đưa lên GitHub
-Giải nén và tải toàn bộ file/thư mục bên trong lên gốc repository, nhánh main. `index.html` nằm ngay ngoài cùng, cùng `game.js`, `style.css`, `vendor/` và `licenses/`. Không đặt thêm thư mục bao ngoài. Không cần cài dependencies hoặc build.
+Giải nén và tải toàn bộ nội dung lên thư mục gốc repository, nhánh main. Đặt `index.html`, `game.js`, `audio.js`, `style.css`, thư mục `vendor/` và `licenses/` cùng cấp. Không đặt thêm thư mục bao ngoài. Không cần build.
 
 ## Chơi trực tiếp và chạy bản tải về
 - Chơi ở đường dẫn bản game được gửi cùng file.
@@ -25,7 +25,7 @@ Giải nén và tải toàn bộ file/thư mục bên trong lên gốc repositor
 | Gợi ý | Nút Gợi ý trong nhiệm vụ | Nút Gợi ý trong nhiệm vụ |
 | Âm thanh | Nút ♫ | Nút ♫ |
 
-Khi đến gần điểm sáng, nhãn hành động hiện ra. Trong hội thoại, nhấn nút để chọn. Chọn chưa phù hợp sẽ được giải thích và thử lại, không bị trừ điểm. Âm thanh mặc định tắt. Game tự tạm dừng khi chuyển tab; trên điện thoại có thể chơi dọc hoặc ngang.
+Khi đến gần điểm sáng, nhãn hành động hiện ra. Trong hội thoại, nhấn nút để chọn. Chọn chưa phù hợp sẽ được giải thích và thử lại, không bị trừ điểm. Nhạc và âm thanh mặc định bật sau lần bấm vào game đầu tiên. Game tự tạm dừng khi chuyển tab; trên điện thoại có thể chơi dọc hoặc ngang.
 
 ## Hành trình và lời giải dành cho phụ huynh
 ### Chặng 1 — Khu rừng thì thầm
@@ -82,10 +82,11 @@ Bối cảnh khủng long và khu bảo tồn là hư cấu. Chu không tự xu�
 - Điểm chặn ở suối, cửa hang và chặng mưa để không vượt nhiệm vụ an toàn.
 - Giao diện bàn phím/cảm ứng, hội thoại có thể cuộn trên màn hình nhỏ, tạm dừng và chơi lại.
 - Mở đầu bằng hai trang kể chuyện và cảnh kết có gia đình khủng long.
-- Âm hiệu tổng hợp đơn giản; chưa có nhạc nền thu âm hoặc giọng đọc.
+- Nhạc nền nhẹ, tiết tấu chậm; tiếng chim từng đợt, tiếng suối tăng theo khoảng cách và tiếng mưa theo cảnh. Tất cả được tổng hợp bằng Web Audio tại thiết bị, không tải bản ghi âm bên ngoài. Chưa có giọng đọc.
 
 ## Kiểm tra đã thực hiện
 - Kiểm tra cú pháp JavaScript và đường dẫn tài nguyên tại chỗ.
+- Bản 1.2: dựng âm thanh PCM stereo ngoại tuyến để kiểm tra tín hiệu, không clipping, nút tắt, ngưng khi rời trang và phát lại. Chưa nghe thử trực tiếp trên điện thoại.
 - Chạy toàn bộ hành trình 4 chặng trong môi trường giả lập DOM và renderer.
 - Kiểm tra từng mục tiêu có đường tiếp cận qua bản đồ va chạm.
 - Kiểm tra lựa chọn sai không mở chốt, suối/hang/mưa chỉ mở sau lựa chọn phù hợp, câu đố đúng/sai, chuyển chặng, lưu đầu chặng, kết thúc, nhật ký, chơi lại và điều khiển bàn phím.
@@ -105,6 +106,7 @@ Bối cảnh khủng long và khu bảo tồn là hư cấu. Chu không tự xu�
 - `index.html`: giao diện tiếng Việt.
 - `style.css`: bố cục máy tính/điện thoại.
 - `game.js`: dựng cảnh, nhân vật, bốn chặng, nhiệm vụ, điều khiển và lưu tiến trình.
+- `audio.js`: nhạc nền, chim, suối, mưa, bật/tắt và tạm ngưng âm thanh.
 - `vendor/`: Three.js 0.180.0 được đóng gói tại chỗ.
 - `licenses/THREE-LICENSE.txt`: giấy phép MIT của Three.js.
 - `README.md`: hướng dẫn, giới hạn và nhật ký phiên bản.
@@ -115,3 +117,14 @@ Bối cảnh khủng long và khu bảo tồn là hư cấu. Chu không tự xu�
 - **1.0 — 2026-10-04:** mở rộng bốn chặng, các lựa chọn giáo dục, câu đố hang, cô kiểm lâm đưa trứng về tổ, nhật ký, huy hiệu, gợi ý và lưu đầu chặng.
 
 - **1.1 — 2026-10-04:** tạo khớp và chu kỳ bước đi cho bố/cô kiểm lâm; bố quay theo hướng di chuyển thực tế, dừng thì ngừng bước; mở rộng nền cảnh và thêm lớp đồi/cây xa, kéo dài dòng suối, thay đường mòn thẳng bằng đường cong. Ranh giới di chuyển an toàn của nhiệm vụ vẫn được giữ.
+
+## Âm thanh — 1.2
+- Nhạc nền giai điệu chậm khoảng 64 nhịp/phút, âm sắc mềm, có lớp hợp âm và tiếng vang nhẹ.
+- Rừng/thung lũng: chim hót thành từng đợt ngắn với khoảng nghỉ và vị trí stereo thay đổi.
+- Suối: tiếng nước gồm nền róc rách và các bọt nước nhỏ; càng gần nước càng rõ.
+- Hang: tắt tiếng chim và suối, giảm nhạc. Khi mưa: thêm tiếng mưa nhẹ.
+- Nút Nhạc & âm thanh bật/tắt toàn bộ. Âm thanh chỉ khởi tạo sau thao tác của người chơi theo yêu cầu trình duyệt.
+- Tự tạm ngưng khi rời tab/ứng dụng; giảm nhạc khi đọc hội thoại.
+- Đây là âm thanh tổng hợp nguyên bản, không phải bản thu thực địa hoặc bài nhạc có sẵn. Không cần thêm file MP3, internet tải âm thanh hoặc giấy phép bản ghi bên ngoài.
+
+- **1.2 — 2026-10-04:** thêm nhạc nền, tiếng chim, suối theo khoảng cách và tiếng mưa; bật sau thao tác đầu tiên, nút bật/tắt và tự ngưng khi rời trang.

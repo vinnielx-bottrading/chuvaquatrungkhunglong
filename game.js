@@ -1,4 +1,5 @@
 import * as T from './vendor/three.module.min.js';
+import { createSoundscape } from './audio.js';
 const $=id=>document.getElementById(id);
 let renderer;
 try{renderer=new T.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance'});}catch(e){$('error').hidden=false;throw e;}
@@ -90,21 +91,22 @@ const chapters=[
  {name:'Thung lũng bị lãng quên',subtitle:'Khám phá bằng đôi mắt, giữ khoảng cách bằng đôi chân.',badge:'Biết tôn trọng',color:0xb7d6c1},
  {name:'Đường về tổ ấm',subtitle:'Một chuyến đi đẹp là khi tất cả trở về an toàn.',badge:'Biết hợp tác',color:0xc7bfac}
 ];
-let state='intro',chapter=0,bridge=false,target=null,elapsed=0,noticeUntil=0,steps=0,totalPlay=0,soundOn=false,audio=null,lastNote=0;
+let state='intro',chapter=0,bridge=false,target=null,elapsed=0,noticeUntil=0,steps=0,totalPlay=0,soundOn=true,audio=null;
 let completed=new Set(),notes=[],badges=[],items=[],puzzleStep=0,escort=false,raining=false,flashlightOn=false,lastSafeToast=0;
 const keys=new Set(),joy={x:0,y:0};let primaryAction=null,secondaryAction=null,choiceActions=[],restored=null,stickId=null;
 const SAVE_KEY='chu-adventure-v1-checkpoint';
 const chapterMarkers=[];const movingCreatures=[];const activeDecor=[];
 let ranger=null,cart=null,baby=null,finalEgg=null,rainMesh=null,guideBeam=null;
 const lightTarget=new T.Object3D();scene.add(lightTarget);const torch=new T.SpotLight(0xffe2a1,0,15,.65,.65,1);torch.target=lightTarget;scene.add(torch);
-function initAudio(){if(!audio){try{audio=new (window.AudioContext||window.webkitAudioContext)();}catch{}}if(audio?.state==='suspended')audio.resume();}
-function tone(freq,dur=.2,vol=.025){if(!soundOn||!audio)return;const o=audio.createOscillator(),g=audio.createGain();o.frequency.value=freq;g.gain.setValueAtTime(vol,audio.currentTime);g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+dur);o.connect(g);g.connect(audio.destination);o.start();o.stop(audio.currentTime+dur);}
+function soundButton(){const b=$('sound');b.style.background=soundOn?'#796936':'#123c35cc';b.setAttribute('aria-label',soundOn?'Tắt nhạc và âm thanh':'Bật nhạc và âm thanh');b.setAttribute('aria-pressed',String(soundOn));b.title=soundOn?'Nhạc và âm thanh đang bật':'Nhạc và âm thanh đang tắt';}
+function initAudio(){if(!soundOn)return;if(!audio){try{audio=createSoundscape();}catch{audio=null;}}if(audio)audio.unlock();}
+function tone(freq,dur=.2,vol=.025){if(soundOn)audio?.effect(freq,dur,vol);}
 function toast(text,dur=5){$('notice').textContent=text;$('notice').classList.add('visible');noticeUntil=elapsed+dur;}
 function release(){joy.x=joy.y=0;stickId=null;$('knob').style.transform='';}
 function resume(){state='play';$('modal').classList.add('hidden');keys.clear();release();$('pause').textContent='Ⅱ';$('pause').setAttribute('aria-label','Tạm dừng');}
 function dialog(label,title,html,options=[{label:'Tiếp tục khám phá',run:resume}],hint=''){
  state='dialog';keys.clear();release();$('context').style.display='none';$('modalLabel').textContent=label;$('modalTitle').innerHTML=title;$('modalText').innerHTML=html;$('modalHint').textContent=hint;$('choices').replaceChildren();$('secondary').hidden=true;secondaryAction=null;choiceActions=options.map(o=>o.run);
- if(options.length===1){$('start').hidden=false;$('start').textContent=options[0].label;primaryAction=options[0].run;}else{$('start').hidden=true;primaryAction=null;options.forEach(o=>{const b=document.createElement('button');b.textContent=o.label;b.onclick=o.run;$('choices').appendChild(b);});}
+ if(options.length===1){$('start').hidden=false;$('start').textContent=options[0].label;primaryAction=options[0].run;}else{$('start').hidden=true;primaryAction=null;options.forEach(o=>{const b=document.createElement('button');b.textContent=o.label;b.onclick=()=>{initAudio();o.run();};$('choices').appendChild(b);});}
  $('modal').classList.remove('hidden');queueMicrotask(()=>($('choices').querySelector('button')||$('start')).focus());
 }
 function remember(title,text){if(!notes.some(n=>n.title===title))notes.push({title,text,chapter});}
@@ -235,21 +237,24 @@ function legal(x,z){
 }
 function pause(){if(state==='play'){state='paused';dialog('NGHỈ CHÂN MỘT CHÚT','Rừng vẫn chờ Chu.','Tiến trình được lưu ở đầu mỗi chặng. Nếu đóng trang giữa chặng, bạn sẽ bắt đầu lại chặng đó.',[{label:'Tiếp tục hành trình',run:resume},{label:'Mở nhật ký',run:()=>{state='paused';journal();}},{label:'Chơi lại từ đầu',run:confirmRestart}]);$('pause').textContent='▶';}}
 $('start').onclick=()=>{initAudio();primaryAction?.();};$('secondary').onclick=()=>secondaryAction?.();$('pause').onclick=pause;$('journal').onclick=()=>journal();$('hint').onclick=()=>{if(state==='play')hint();};$('interact').onclick=act;$('touchAction').onclick=act;
-$('sound').onclick=()=>{initAudio();soundOn=!soundOn;$('sound').style.background=soundOn?'#796936':'#123c35cc';$('sound').setAttribute('aria-label',soundOn?'Tắt âm thanh':'Bật âm thanh');$('sound').setAttribute('aria-pressed',String(soundOn));tone(660);};
+$('sound').onclick=()=>{soundOn=!soundOn;if(soundOn)initAudio();audio?.setEnabled(soundOn);soundButton();};soundButton();
+window.addEventListener('focus',()=>{audio?.setFocused(true);});
+window.addEventListener('pagehide',()=>{audio?.setFocused(false);});
+window.addEventListener('pageshow',()=>{if(!document.hidden)audio?.setFocused(true);});
 window.addEventListener('keydown',e=>{if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key)&&state==='play')e.preventDefault();if(e.key==='Escape'){if(state==='play')pause();return;}if(e.key.toLowerCase()==='j'&&!e.repeat){journal();return;}if(e.key.toLowerCase()==='e'&&!e.repeat){act();return;}if(state==='play')keys.add(e.key.toLowerCase());
  if(e.key==='Tab'&&state==='dialog'){const buttons=[...$('modal').querySelectorAll('button:not([hidden])')];const first=buttons[0],last=buttons[buttons.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last?.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus();}}
-});window.addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));window.addEventListener('blur',()=>{keys.clear();release();pause();});document.addEventListener('visibilitychange',()=>{if(document.hidden){keys.clear();release();pause();}});
+});window.addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));window.addEventListener('blur',()=>{keys.clear();release();pause();audio?.setFocused(false);});document.addEventListener('visibilitychange',()=>{audio?.setFocused(!document.hidden);if(document.hidden){keys.clear();release();pause();}});
 const stick=$('stick');function stickMove(e){const r=stick.getBoundingClientRect();let x=e.clientX-r.left-r.width/2,y=e.clientY-r.top-r.height/2;const len=Math.hypot(x,y);if(len>38){x*=38/len;y*=38/len;}joy.x=x/38;joy.y=y/38;$('knob').style.transform=`translate(${x}px,${y}px)`;}
 stick.addEventListener('pointerdown',e=>{if(state!=='play')return;stickId=e.pointerId;stick.setPointerCapture(e.pointerId);stickMove(e);});stick.addEventListener('pointermove',e=>{if(e.pointerId===stickId)stickMove(e);});stick.addEventListener('pointerup',release);stick.addEventListener('pointercancel',release);
 function resize(){const w=innerWidth,h=innerHeight,aspect=w/h,halfH=w<700?11:13;camera.left=-halfH*aspect;camera.right=halfH*aspect;camera.top=halfH;camera.bottom=-halfH;camera.updateProjectionMatrix();renderer.setSize(w,h);}window.addEventListener('resize',resize);resize();
 renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();$('errorText').textContent='Khu rừng cần tải lại. Tiến trình đầu chặng đã được lưu nếu trình duyệt cho phép.';$('error').hidden=false;});
 const clock=new T.Clock();function frame(){
- const dt=Math.min(clock.getDelta(),.045),time=clock.elapsedTime;elapsed+=dt;let moving=false;
+ const dt=Math.min(clock.getDelta(),.045),time=clock.elapsedTime;elapsed+=dt;let moving=false;audio?.update({chapter,x:chu.position.x,z:chu.position.z,raining,paused:state!=='play'});
  if(state==='play'){
   totalPlay+=dt;let sx=joy.x+(keys.has('d')||keys.has('arrowright')?1:0)-(keys.has('a')||keys.has('arrowleft')?1:0),sy=joy.y+(keys.has('s')||keys.has('arrowdown')?1:0)-(keys.has('w')||keys.has('arrowup')?1:0);const n=Math.hypot(sx,sy);
   if(n>.08){if(n>1){sx/=n;sy/=n;}const vx=sx*.819+sy*.573,vz=-sx*.573+sy*.819;const nx=chu.position.x+vx*dt*3,nz=chu.position.z+vz*dt*3;let moved=false;if(legal(nx,chu.position.z)){chu.position.x=nx;moved=true;}if(legal(chu.position.x,nz)){chu.position.z=nz;moved=true;}const angle=Math.atan2(vx,vz),delta=T.MathUtils.euclideanModulo(angle-chu.rotation.y+Math.PI,Math.PI*2)-Math.PI;chu.rotation.y+=delta*Math.min(dt*12,1);moving=moved;steps+=dt*10;if(!legal(nx,nz)&&elapsed-lastSafeToast>7){toast('Chu ở trên lối đi cùng bố. Nếu chưa rõ đường, hãy bấm Gợi ý.',4);lastSafeToast=elapsed;}}
   target=nearest();$('context').style.display=target?'flex':'none';if(target){$('contextText').textContent=target.title;$('interact').textContent=`E · ${target.action}`;$('touchAction').textContent=target.action;}else $('touchAction').textContent='Quan sát';$('touchAction').classList.toggle('ready',!!target);
-  if(soundOn&&time-lastNote>5){tone(chapter===1?330:1100+Math.sin(time)*180,.17,.012);lastNote=time;}
+
  }
  if(elapsed>noticeUntil)$('notice').classList.remove('visible');
  chu.position.y=T.MathUtils.lerp(chu.position.y,chapter===0&&bridge&&Math.abs(chu.position.z)<2.8&&Math.abs(chu.position.x)<1.1?.53:0,Math.min(dt*10,1));body.position.y=moving?Math.sin(steps*2)*.045:Math.sin(time*2)*.02;legs.forEach((l,i)=>l.rotation.x=moving?Math.sin(steps+i*Math.PI)*.6:0);arms.forEach((a,i)=>a.rotation.x=moving?-Math.sin(steps+i*Math.PI)*.48:Math.sin(time*2)*.03);head.rotation.y=moving?0:Math.sin(time*.7)*.08;
@@ -263,6 +268,6 @@ const clock=new T.Clock();function frame(){
  look.lerp(chu.position,1-Math.exp(-dt*4));camera.position.set(look.x+14,24,look.z+20);camera.lookAt(look.x,0,look.z);renderer.render(scene,camera);requestAnimationFrame(frame);
 }
 buildChapter();restored=readSave();
-if(restored&&!restored.finished){dialog('CHUYẾN PHIÊU LƯU ĐANG CHỜ','Tiếp tục cùng Chu?',`Thiết bị này đã lưu đầu chặng <strong>${restored.chapter+1}: ${chapters[restored.chapter].name}</strong>.`,[{label:'Tiếp tục từ đầu chặng đã lưu',run:()=>{chapter=restored.chapter;notes=restored.notes;badges=restored.badges;totalPlay=Number(restored.totalPlay)||0;buildChapter();resume();}},{label:'Bắt đầu chuyến đi mới',run:newGame}]);}else{dialog('CHU & QUẢ TRỨNG THẤT LẠC · 1.1','Một trang truyện.<br>Bốn chặng khám phá.','Cùng Chu và bố lần theo dấu vết, giải câu đố trong hang và giúp một quả trứng tìm về tổ.<br><br><strong>Tò mò, quan sát và biết nhờ giúp đỡ.</strong>',[{label:'Mở cuốn truyện của Chu',run:newGame}],'Tiến trình tự lưu đầu mỗi chặng trên thiết bị này.');}
+if(restored&&!restored.finished){dialog('CHUYẾN PHIÊU LƯU ĐANG CHỜ','Tiếp tục cùng Chu?',`Thiết bị này đã lưu đầu chặng <strong>${restored.chapter+1}: ${chapters[restored.chapter].name}</strong>.`,[{label:'Tiếp tục từ đầu chặng đã lưu',run:()=>{chapter=restored.chapter;notes=restored.notes;badges=restored.badges;totalPlay=Number(restored.totalPlay)||0;buildChapter();resume();}},{label:'Bắt đầu chuyến đi mới',run:newGame}]);}else{dialog('CHU & QUẢ TRỨNG THẤT LẠC · 1.2','Một trang truyện.<br>Bốn chặng khám phá.','Cùng Chu và bố lần theo dấu vết, giải câu đố trong hang và giúp một quả trứng tìm về tổ.<br><br><strong>Tò mò, quan sát và biết nhờ giúp đỡ.</strong>',[{label:'Mở cuốn truyện của Chu',run:newGame}],'Tiến trình tự lưu đầu mỗi chặng trên thiết bị này.');}
 frame();
 try{document.modelContext?.registerTool({name:'read_chu_adventure_progress',description:'Read the current chapter, completed discoveries and next objective in Chu’s adventure.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:true},execute(input){if(!input||typeof input!=='object'||Object.keys(input).length)throw new Error('Expected an empty object');return {state,chapter:chapter+1,chapterName:chapters[chapter].name,completed:[...completed],badges:[...badges],nextObjective:items.find(i=>i.required&&!completed.has(i.id))?.title||'Điểm cuối chặng',checkpoint:'Start of chapter, on this device'};}});}catch(e){console.warn('Progress integration unavailable',e);}
