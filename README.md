@@ -1,6 +1,6 @@
 # Chu và Quả Trứng Thất Lạc
 
-## Phiên bản 1.4 — Bản đầu để chơi và điều chỉnh
+## Phiên bản 1.4.1 — Bản đầu để chơi và điều chỉnh
 Game khám phá 3D low-poly bằng tiếng Việt, dành cho trẻ chơi cùng phụ huynh. Chu đọc truyện khủng long, nhận ra một ngọn núi quen thuộc, xin phép và cùng bố lên đường. Trẻ tập quan sát, giải câu đố, nhận biết tình huống nguy hiểm và nhờ người lớn hỗ trợ.
 
 Bản 1.4 có một hành trình hoàn chỉnh gồm 4 chặng. Thời lượng thiết kế hướng tới khoảng 10–15 phút khi đọc và khám phá; chưa đo thời gian chơi với trẻ thực tế, người chơi biết đáp án có thể hoàn thành nhanh hơn.
@@ -148,5 +148,11 @@ Giấy phép font: `licenses/NOTO-SANS-OFL.txt` (SIL Open Font License).
 - Thư viện QR: qrcode-generator của Kazuhiko Arase, MIT; mã và thông báo bản quyền tại `vendor/qrcode.mjs`, giấy phép tại `licenses/QRCODE-LICENSE.txt`.
 - Đã giải mã độc lập 6 QR (ba mức gợi ý, mức tùy ý và hai biên), đối chiếu tài khoản/ngân hàng/nội dung/số tiền và CRC QR gốc; kiểm tra từ chối số không hợp lệ. Chưa thực hiện chuyển khoản thực tế bằng ứng dụng ngân hàng. Chưa kiểm tra giao diện mới trên thiết bị/GPU thật.
 
-## Đưa lên GitHub
-Giải nén và tải trực tiếp toàn bộ nội dung vào thư mục gốc repository (index.html ở gốc). Với GitHub Pages, chọn nhánh main và /(root). Không cần npm install hoặc build.
+## Điều chỉnh giao diện 1.4.1
+- Nút Ủng hộ nằm cuối cùng hàng Nhật ký / Âm thanh / Tạm dừng. Điện thoại dùng biểu tượng trái tim cùng hàng để tiết kiệm chỗ.
+- QR mở trong hộp nhỏ rộng tối đa 320px phía bên phải dưới hàng nút; không phủ nền, làm mờ hay chiếm toàn màn hình. QR rộng 176px.
+- Đóng bằng nút ×, Esc, bấm lại Ủng hộ hoặc bấm ngoài hộp. Game giữ nguyên trạng thái trước khi mở.
+- Giữ các mức tiền, số tiền tùy chọn, tài khoản và nội dung QR của 1.4.
+
+## GitHub
+Tải toàn bộ nội dung ZIP vào gốc repository, index.html ở gốc. GitHub Pages chọn main, /(root). Không cần build.

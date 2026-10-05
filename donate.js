@@ -9,7 +9,12 @@ export function setupDonation({onOpen,onClose}){
  const format=n=>new Intl.NumberFormat('vi-VN').format(n)+'đ';
  function update(){const raw=input.value.trim();const amount=/^\d+$/.test(raw)?Number(raw):NaN;buttons.forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.amount)===amount)));try{const qr=qrMatrix(amount),count=qr.getModuleCount(),scale=6;canvas.width=canvas.height=(count+8)*scale;const ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.fillStyle='#000';for(let y=0;y<count;y++)for(let x=0;x<count;x++)if(qr.isDark(y,x))ctx.fillRect((x+4)*scale,(y+4)*scale,scale,scale);canvas.hidden=false;$('donationError').textContent='';$('donationTotal').textContent=format(amount);canvas.setAttribute('aria-label',`QR chuyển ${format(amount)} đến ${recipient.name}, nội dung ${recipient.message}`);}catch(error){canvas.hidden=true;canvas.width=canvas.height=0;$('donationTotal').textContent='Chưa có số tiền hợp lệ';$('donationError').textContent=error.message;}}
  buttons.forEach(b=>b.onclick=()=>{input.value=b.dataset.amount;update();});input.addEventListener('input',update);
- $('donate').onclick=()=>{if(dialog.open)return;previousFocus=document.activeElement;onOpen();update();dialog.showModal();$('donationClose').focus();};
- $('donationClose').onclick=()=>dialog.close();dialog.addEventListener('click',e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dialog.close();}});
- dialog.addEventListener('close',()=>{onClose();previousFocus?.focus();});
+ const trigger=$('donate');
+ function position(){const r=trigger.getBoundingClientRect();dialog.style.top=Math.round(r.bottom+8)+'px';dialog.style.maxHeight=`${Math.max(120,innerHeight-r.bottom-20)}px`;}
+ trigger.onclick=()=>{if(dialog.open){dialog.close();return;}previousFocus=document.activeElement;onOpen();update();position();dialog.show();trigger.setAttribute('aria-expanded','true');$('donationClose').focus();};
+ $('donationClose').onclick=()=>dialog.close();
+ document.addEventListener('keydown',e=>{if(dialog.open&&e.key==='Escape'){e.preventDefault();dialog.close();}});
+ document.addEventListener('click',e=>{if(dialog.open&&!dialog.contains(e.target)&&!trigger.contains(e.target)){e.preventDefault();e.stopPropagation();dialog.close();}},true);
+ window.addEventListener('resize',()=>{if(dialog.open)position();});
+ dialog.addEventListener('close',()=>{trigger.setAttribute('aria-expanded','false');onClose();previousFocus?.focus();});
 }
