@@ -136,7 +136,40 @@ function newGame(){chapter=0;notes=[];badges=[];totalPlay=0;buildChapter();check
 function introStory(){dialog('01 · CUỐN TRUYỆN CŨ','Một ngọn núi rất quen…','Chu đang đọc truyện khủng long thì nhận ra ngọn núi trong tranh giống hệt ngọn núi sau làng.<br><br><strong>“Bố ơi, mình cùng đi tìm dấu vết được không?”</strong>',[{label:'Mở trang tiếp theo',run:()=>dialog('02 · CHUẨN BỊ LÊN ĐƯỜNG','Một ba lô nhỏ,<br>một người bạn lớn.','Bố chuẩn bị nước uống, đèn và bản đồ. Hai bố con hẹn nhau: luôn đi trên đường cho phép, ở gần nhau và dừng lại khi chưa chắc chắn.<br><br>Chu bỏ cuốn truyện vào ba lô. Chuyến khám phá bắt đầu!',[{label:'Cùng bố vào khu rừng',run:resume}],'WASD / phím mũi tên hoặc cần cảm ứng để di chuyển. E để tương tác.')}]);}
 function smallSign(parent,x,z){const g=new T.Group();g.position.set(x,0,z);parent.add(g);box(g,0x6b5741,0,.6,0,.12,1.2,.12);box(g,0xdfc892,0,1.15,0,.75,.5,.1);return g;}
 function rope(parent,x,z,length){for(let n=0;n<=length;n+=2.5)cyl(parent,0x927659,x,.65,z-n,.065,.09,1.3,5);box(parent,0xc6b587,x,1.05,z-length/2,.045,.045,length);}
-function cloneDino(x,z,scale=1){const d=dino.clone(true);d.visible=true;d.position.set(x,0,z);d.scale.setScalar(scale);world.add(d);movingCreatures.push({g:d,scale});return d;}
+function cloneDino(x,z,scale=1,options={}){
+ const g=new T.Group();g.position.set(x,0,z);g.scale.setScalar(scale);world.add(g);
+ const colors=options.colors||[0x7f9d6b,0xaac283];const trunk=new T.Group();g.add(trunk);ball(trunk,colors[0],0,1.65,0,1.25,1,1.9);ball(trunk,colors[1],0,1.24,.5,.93,.64,1.45);
+ const legs=[];for(const lx of [-.8,.8])for(const lz of [-1.05,1.05]){const leg=new T.Group();leg.position.set(lx,1.3,lz);g.add(leg);cyl(leg,colors[0],0,-.55,0,.25,.33,1.1);ball(leg,0x647b55,0,-1.15,.06,.37,.16,.43);legs.push(leg);}
+ const neckRig=new T.Group();neckRig.position.set(0,1.95,1.3);trunk.add(neckRig);const n=ball(neckRig,colors[0],0,1.15,.2,.48,1.55,.55);n.rotation.x=.12;
+ const headRig=new T.Group();headRig.position.set(0,2.65,.75);neckRig.add(headRig);ball(headRig,colors[0],0,0,0,.55,.48,.69);ball(headRig,colors[1],0,-.22,.32,.43,.22,.49);
+ for(const xx of [-.47,.47]){ball(headRig,0x263d31,xx,.12,.27,.066);ball(headRig,0xf6ecc6,xx*.98,.135,.315,.018);}
+ const jaw=new T.Group();jaw.position.set(0,-.26,.23);headRig.add(jaw);ball(jaw,colors[1],0,0,.16,.4,.09,.42);
+ const tailRig=new T.Group();tailRig.position.set(0,1.55,-1.65);trunk.add(tailRig);const tailPart=mesh(new T.ConeGeometry(.48,3.3,7),colors[0],tailRig,0,0,-1.4);tailPart.rotation.x=-Math.PI/2;
+ for(let i=0;i<5;i++)ball(trunk,colors[1],0,2.55-i*.045,.65-i*.5,.16,.14,.23);
+ const data={g,scale,trunk,legs,neckRig,headRig,jaw,tailRig,x,z,rx:options.rx??.7,rz:options.rz??1.65,offset:options.offset??movingCreatures.length*4.7,walk:options.walk!==false,phase:0,blend:0,previous:g.position.clone()};movingCreatures.push(data);
+ // Grass tufts stay inside the animal enclosure, where each animal pauses to graze.
+ if(data.walk)for(const side of [-1,1])for(let i=0;i<9;i++){const a=i*2.4;const blade=mesh(new T.ConeGeometry(.14,.55,4),i%2?0x93ae58:0x658e48,world,x+Math.cos(a)*.9,.2,z+side*data.rz+Math.sin(a)*.8);blade.rotation.z=Math.sin(i)*.3;}
+ return g;
+}
+function animateDinosaur(d,dt,time){
+ const t=time+d.offset,cycle=Math.floor(t/26),p=t%26,progress=Math.min(p/10,1),direction=cycle%2?1:-1;
+ if(d.walk){d.g.position.x=d.x+Math.sin(progress*Math.PI)*d.rx;d.g.position.z=d.z+direction*(progress*2-1)*d.rz;}
+ const dx=d.g.position.x-d.previous.x,dz=d.g.position.z-d.previous.z,distance=Math.hypot(dx,dz);d.previous.copy(d.g.position);const walking=d.walk&&p<10;d.phase+=Math.min(distance,.12)*5;d.blend=T.MathUtils.lerp(d.blend,walking?1:0,1-Math.exp(-dt*7));
+ if(distance>.0001&&walking){const heading=Math.atan2(dx,dz);d.g.rotation.y+=(T.MathUtils.euclideanModulo(heading-d.g.rotation.y+Math.PI,Math.PI*2)-Math.PI)*Math.min(dt*2,1);}
+ d.legs.forEach((leg,i)=>{leg.rotation.x=Math.sin(d.phase+(i===0||i===3?0:Math.PI))*.3*d.blend;});
+ const grazing=d.walk&&p>11&&p<23;d.neckRig.rotation.x=T.MathUtils.lerp(d.neckRig.rotation.x,grazing?1.73:0,1-Math.exp(-dt*1.7));d.headRig.rotation.y=grazing?Math.sin(time*1.8+d.offset)*.09:Math.sin(time*.45+d.offset)*.12;d.jaw.rotation.x=grazing?Math.max(0,Math.sin(time*5))*.16:0;d.tailRig.rotation.y=Math.sin(time*.8+d.offset)*.15;d.trunk.position.y=Math.sin(time*1.2+d.offset)*.015+Math.sin(d.phase*2)*.025*d.blend;
+}
+function adventurePortal(z,cave=false){
+ const g=new T.Group();g.position.z=z;world.add(g);const rockColors=cave?[0x687981,0x7a8787,0x89958e]:[0x7d8671,0x94957a,0x67785e];
+ const mouth=new T.Shape();mouth.moveTo(-3,0);mouth.lineTo(-3,1.15);mouth.bezierCurveTo(-3.2,5,2.8,5.4,3,1.2);mouth.lineTo(3,0);mouth.closePath();const opening=mesh(new T.ShapeGeometry(mouth),0x213c3c,g,0,0,-.8);opening.material=new T.MeshBasicMaterial({color:cave?0x47666a:0x1c3330,side:T.DoubleSide});
+ for(let i=0;i<13;i++){const a=i/12*Math.PI;const r=3.4+Math.sin(i*2.1)*.2;const rock=ball(g,rockColors[i%3],Math.cos(a)*r,.35+Math.sin(a)*3.7,-.1+Math.sin(i)*.25,.7+(i%3)*.1,.85,1.05);rock.rotation.z=a*.35;}
+ for(const side of [-1,1]){ball(g,rockColors[0],side*4.1,.6,.2,1.5,.95,1.4);ball(g,0x5b7952,side*3.2,1.1,.65,.7,.23,.6);}
+ for(let i=0;i<5;i++){const xx=-2.1+i*1.02,yy=3.7-Math.abs(xx)*.18,len=.7+(i%3)*.35;const vine=new T.CatmullRomCurve3([new T.Vector3(xx,yy,.7),new T.Vector3(xx+.15,yy-len*.5,.85),new T.Vector3(xx-.12,yy-len,1)]);mesh(new T.TubeGeometry(vine,8,.04,4,false),0x476e45,g);for(let k=0;k<3;k++){const leaf=ball(g,0x63864b,xx+(k%2?.12:-.13),yy-k*len/3,.92,.18,.085,.12);leaf.rotation.z=k%2?.5:-.5;}}
+ for(const side of [-1,1]){cyl(g,0x796443,side*2.45,.7,1.1,.08,.1,1.4);const lantern=ball(g,0xffd690,side*2.45,1.5,1.1,.18,.27,.18);lantern.material=new T.MeshStandardMaterial({color:0xffd690,emissive:0xe9ac50,emissiveIntensity:1.2});}
+ const glow=new T.PointLight(cave?0xb0d4b4:0xffd08d,5,8,1.5);glow.position.set(0,2.2,1);g.add(glow);activeDecor.push({glow,phase:z});
+ if(cave)for(let i=0;i<3;i++){const rune=mesh(new T.OctahedronGeometry(.2),[0xa9cc83,0xd7c294,0xf2d681][i],g,(i-1)*.68,3.55,1);rune.rotation.z=i*.3;}
+ return g;
+}
 function makeEgg(x,z){const g=eggGroup.clone(true);g.visible=true;g.position.set(x,0,z);world.add(g);return g;}
 function plaque(x,z,kind){const g=new T.Group();g.position.set(x,0,z);world.add(g);box(g,0x6b7880,0,.5,0,1.3,1,.7);if(kind===0){const leaf=ball(g,0x9ac977,0,1.1,0,.4,.1,.2);leaf.rotation.y=.6;}if(kind===1){for(const x of [-.2,.2]){ball(g,0xd6c090,x,1.1,0,.12,.05,.2);for(let j=-1;j<=1;j++)ball(g,0xd6c090,x+j*.085,1.1,-.16,.035,.04,.09);}}if(kind===2){ball(g,0xf3ce75,0,1.2,0,.25);for(let i=0;i<8;i++){const ray=box(g,0xf3ce75,Math.cos(i*Math.PI/4)*.36,1.2,Math.sin(i*Math.PI/4)*.36,.16,.05,.04);ray.rotation.y=-i*Math.PI/4;}}}
 function commonGround(color,pathColor=0xbca988){landscape(world,color,chapter===2);const v=[],ind=[];for(let i=0;i<=60;i++){const z=28-i,center=Math.sin(z*.16)*.65,width=2.8+.25*Math.sin(z*.43);v.push(center-width,.018,z,center+width,.018,z);if(i<60){const k=i*2;ind.push(k,k+2,k+1,k+1,k+2,k+3);}}const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(v,3));g.setIndex(ind);g.computeVertexNormals();const pathMesh=mesh(g,pathColor,world);pathMesh.material.side=T.DoubleSide;}
@@ -148,7 +181,7 @@ function buildCave(){
  for(const z of [16,4,-8,-19]){cyl(world,0x88724d,-5,1.1,z,.07,.1,2.2);const bulb=ball(world,0xffd284,-5,2.2,z,.2);bulb.material=new T.MeshBasicMaterial({color:0xffd284});}
  for(const z of [3,-14]){const l=new T.PointLight(0x90b9d3,7,13,1.2);l.position.set(0,4,z);world.add(l);}
  plaque(-4,12,0);plaque(4,-1,1);plaque(-4,-12,2);
- box(world,0x778285,0,2,-21,5.5,4,.7);box(world,0xaebbac,-2.9,2.2,-21,.6,4.4,1);box(world,0xaebbac,2.9,2.2,-21,.6,4.4,1);box(world,0xaebbac,0,4.4,-21,6.4,.6,1);
+ adventurePortal(-21,true);
  smallSign(world,1.6,18);flashlightOn=true;
 }
 function buildValley(){
@@ -156,7 +189,7 @@ function buildValley(){
  const lake=ball(world,0x63b6c4,9,.02,1,5.5,.03,8);lake.castShadow=false;
  for(let i=0;i<35;i++){const x=(rand()-.5)*40,z=(rand()-.5)*48;if(Math.abs(x)<6||Math.hypot(x-9,z-1)<9)continue;ball(world,0x799355,x,.4,z,.7,.65,.8);if(i%3===0)ball(world,0xb9bd87,x,.2,z,1.2,.5,1.2);}
  for(let i=0;i<9;i++)ball(world,0x90a78a,-20+i*5,3,-26,4,4+rand()*4,4);
- cloneDino(-10,7,1);cloneDino(-11,-12,.7);rope(world,-5.4,14,31);rope(world,3.9,8,15);
+ cloneDino(-10.8,7,.86,{offset:0,rx:.45,rz:1.5});cloneDino(-15.8,12,1.02,{offset:6,colors:[0x8e9a69,0xc0c48b]});cloneDino(-17,2,.67,{offset:13,colors:[0x78968a,0xb2c8a0]});cloneDino(-11.5,-5,.8,{offset:19,rx:.4});cloneDino(-17,-10,1.1,{offset:9,colors:[0x939774,0xc8c699]});cloneDino(-11.8,-15,.55,{offset:3});cloneDino(-20,19,.7,{offset:16,colors:[0x8e9675,0xc1c7a3]});rope(world,-5.4,14,31);rope(world,3.9,8,15);
  smallSign(world,0,-5);box(world,0x4d7e62,.15,1.2,-5,.9,.14,.09);box(world,0xb37f59,-.25,.95,-5,.8,.13,.09);
  makeEgg(3,-13);ranger=createAdult(0x778365);ranger.position.set(5,0,-13);world.add(ranger);cyl(ranger,0xb8a774,0,2.55,0,.52,.52,.06,10);cyl(ranger,0xb8a774,0,2.67,0,.32,.36,.22,10);
  smallSign(world,-3,10);smallSign(world,3,3);smallSign(world,0,-21);
@@ -166,7 +199,7 @@ function buildMountain(){
  rope(world,-5.7,24,48);rope(world,5.7,24,48);
  for(let i=0;i<24;i++){const x=(i%2?-1:1)*(8+rand()*8),z=(rand()-.5)*55;ball(world,0x7d877a,x,1,z,2+rand()*2,2+rand()*4,2);}
  const hut=new T.Group();hut.position.set(-2,0,-1);world.add(hut);box(hut,0x826a4b,0,1.2,-1.35,4.4,2.4,.2);box(hut,0xa08c63,-2.1,1.2,0,.2,2.4,2.7);box(hut,0xa08c63,2.1,1.2,0,.2,2.4,2.7);const roof=mesh(new T.ConeGeometry(3.5,1.2,4),0x506b62,hut,0,2.9,0);roof.rotation.y=Math.PI/4;box(hut,0xc2a879,0,.35,-.7,2.8,.25,.6);
- finalEgg=makeEgg(0,-23);finalEgg.visible=false;cloneDino(-4,-25,.9);baby=dino.clone(true);baby.visible=false;baby.position.set(1.2,0,-22.7);baby.scale.setScalar(.19);world.add(baby);
+ finalEgg=makeEgg(0,-23);finalEgg.visible=false;cloneDino(-4,-25,.9,{walk:false});baby=cloneDino(1.2,-22.7,.19,{walk:false});baby.visible=false;
  rope(world,-5.7,-17,0);box(world,0x9c8257,0,1.1,-18,11.4,.1,.1);
  for(let i=0;i<20;i++){const a=i/20*Math.PI*2;const twig=box(world,0x806845,Math.cos(a)*2,.12,-23+Math.sin(a)*1.5,1.4,.12,.15);twig.rotation.y=-a;}
  cart=new T.Group();world.add(cart);box(cart,0xa68d66,0,.5,0,1,.15,1.6);const e=eggGroup.clone(true);e.position.set(0,.45,0);e.scale.setScalar(.55);cart.add(e);for(const x of [-.55,.55])for(const z of [-.55,.55]){const wheel=cyl(cart,0x45463d,x,.25,z,.23,.23,.12,9);wheel.rotation.z=Math.PI/2;}
@@ -188,7 +221,7 @@ function setupForest(){
  clues.forEach((c,i)=>{const id=['foot','leaf','shell'][i];item(id,c.title,c.x,c.z,()=>acknowledge(items.find(it=>it.id===id),`Chu: “${i===2?'Vỏ trứng có đốm xanh! Đường mòn dẫn đến khu hang tham quan phía trước.':c.text}”`),{markerObject:c.marker});});
  item('river','Một lối qua suối',0,3.1,()=>choose('river','Tò mò là điều tốt.<br>An toàn là điều đầu tiên.','Có cây cầu trên đường tham quan. Chu muốn sang bờ bên kia tìm dấu vết.', ['Tự lội qua đoạn nước trông có vẻ nông','Đẩy cây làm một chiếc cầu mới','Dừng lại, nhờ bố đi cùng qua cầu'],2,{title:'Qua suối cùng người lớn',text:'Không tự xuống nước, đẩy cây hay dùng cây làm cầu. Chu nhờ bố tìm lối phù hợp và đi cùng. Nếu đường không an toàn, hai bố con sẽ quay lại.',wrong:'Nhìn bằng mắt không biết hết độ sâu và sức nước. Chu hãy dừng lại và nhờ bố đi cùng nhé.',button:'Đi trên cầu cùng bố'},()=>{bridge=true;gate.visible=false;logMarker.visible=false;}),{markerObject:logMarker,action:'Nhờ bố giúp'});
  const order=['berry','foot','leaf','river','shell'];items.sort((a,b)=>order.indexOf(a.id)-order.indexOf(b.id));
- const arch=new T.Group();world.add(arch);box(arch,0x7a8370,-2.5,2,-20,.8,4,1.8);box(arch,0x7a8370,2.5,2,-20,.8,4,1.8);box(arch,0x7a8370,0,4,-20,5.8,.9,1.8);smallSign(world,2,-17.5);
+ adventurePortal(-20);smallSign(world,3.4,-17.5);
  item('exit','Lối đến hang ánh sáng',0,-18,finishChapter,{required:false,action:'Đi tiếp'});
 }
 function setupCave(){
@@ -261,13 +294,13 @@ const clock=new T.Clock();function frame(){
  const fatherOffset=chapter===0&&Math.abs(chu.position.z)<4?-.1:Math.min(1.1,4.8-chu.position.x);father.position.x=T.MathUtils.lerp(father.position.x,chu.position.x+fatherOffset,Math.min(dt*4,1));father.position.z=T.MathUtils.lerp(father.position.z,chu.position.z+1.2,Math.min(dt*4,1));father.position.y=T.MathUtils.lerp(father.position.y,chapter===0&&bridge&&Math.abs(father.position.z)<2.8?.53:0,Math.min(dt*10,1));const fatherRig=adultRigs.get(father),walkDx=father.position.x-fatherRig.previous.x,walkDz=father.position.z-fatherRig.previous.z;if(Math.hypot(walkDx,walkDz)>.001){const direction=Math.atan2(walkDx,walkDz);father.rotation.y+= (T.MathUtils.euclideanModulo(direction-father.rotation.y+Math.PI,Math.PI*2)-Math.PI)*Math.min(dt*8,1);}animateAdult(father,dt,time);
  if(escort&&cart&&ranger){cart.position.set(chu.position.x-.65,0,chu.position.z+3.3);ranger.position.set(chu.position.x-.65,0,chu.position.z+4.65);ranger.rotation.y=chu.rotation.y;}if(ranger)animateAdult(ranger,dt,time,escort);
  if(chapter===0){trees.forEach(t=>t.g.rotation.z=Math.sin(time*.7+t.phase)*.013);ripples.forEach((r,i)=>r.position.x=-23+i*1.9+Math.sin(time*.8+i)*.4);for(const {g,base} of markers){g.position.y=base+Math.sin(time*2+g.position.z)*.15;g.rotation.y=time*.7;}}
- for(const m of chapterMarkers){m.position.y=1.65+Math.sin(time*2+m.position.z)*.16;m.rotation.y=time*.7;}for(const d of movingCreatures){d.g.scale.y=d.scale*(1+Math.sin(time*1.2)*.013);d.g.rotation.y=.8+Math.sin(time*.3)*.07;}
+ for(const m of chapterMarkers){m.position.y=1.65+Math.sin(time*2+m.position.z)*.16;m.rotation.y=time*.7;}for(const d of movingCreatures)animateDinosaur(d,dt,time);for(const a of activeDecor)a.glow.intensity=4.8+Math.sin(time*1.7+a.phase)*.25;
  fireflies.forEach(f=>{f.m.position.set(f.x+Math.sin(time*.35+f.p),f.y+Math.sin(time+f.p)*.2,f.z+Math.cos(time*.3+f.p)*.5);});
  if(rainMesh?.visible){const p=rainMesh.geometry.attributes.position;for(let i=0;i<p.count;i++){let y=p.getY(i)-dt*9;if(y<0)y=14;p.setY(i,y);}p.needsUpdate=true;}
  torch.intensity=chapter===1&&flashlightOn?7:0;torch.position.set(chu.position.x,1.5,chu.position.z);lightTarget.position.set(chu.position.x+Math.sin(chu.rotation.y)*5,.2,chu.position.z+Math.cos(chu.rotation.y)*5);
  look.lerp(chu.position,1-Math.exp(-dt*4));camera.position.set(look.x+14,24,look.z+20);camera.lookAt(look.x,0,look.z);renderer.render(scene,camera);requestAnimationFrame(frame);
 }
 buildChapter();restored=readSave();
-if(restored&&!restored.finished){dialog('CHUYẾN PHIÊU LƯU ĐANG CHỜ','Tiếp tục cùng Chu?',`Thiết bị này đã lưu đầu chặng <strong>${restored.chapter+1}: ${chapters[restored.chapter].name}</strong>.`,[{label:'Tiếp tục từ đầu chặng đã lưu',run:()=>{chapter=restored.chapter;notes=restored.notes;badges=restored.badges;totalPlay=Number(restored.totalPlay)||0;buildChapter();resume();}},{label:'Bắt đầu chuyến đi mới',run:newGame}]);}else{dialog('CHU & QUẢ TRỨNG THẤT LẠC · 1.2','Một trang truyện.<br>Bốn chặng khám phá.','Cùng Chu và bố lần theo dấu vết, giải câu đố trong hang và giúp một quả trứng tìm về tổ.<br><br><strong>Tò mò, quan sát và biết nhờ giúp đỡ.</strong>',[{label:'Mở cuốn truyện của Chu',run:newGame}],'Tiến trình tự lưu đầu mỗi chặng trên thiết bị này.');}
+if(restored&&!restored.finished){dialog('CHUYẾN PHIÊU LƯU ĐANG CHỜ','Tiếp tục cùng Chu?',`Thiết bị này đã lưu đầu chặng <strong>${restored.chapter+1}: ${chapters[restored.chapter].name}</strong>.`,[{label:'Tiếp tục từ đầu chặng đã lưu',run:()=>{chapter=restored.chapter;notes=restored.notes;badges=restored.badges;totalPlay=Number(restored.totalPlay)||0;buildChapter();resume();}},{label:'Bắt đầu chuyến đi mới',run:newGame}]);}else{dialog('CHU & QUẢ TRỨNG THẤT LẠC · 1.3','Một trang truyện.<br>Bốn chặng khám phá.','Cùng Chu và bố lần theo dấu vết, giải câu đố trong hang và giúp một quả trứng tìm về tổ.<br><br><strong>Tò mò, quan sát và biết nhờ giúp đỡ.</strong>',[{label:'Mở cuốn truyện của Chu',run:newGame}],'Tiến trình tự lưu đầu mỗi chặng trên thiết bị này.');}
 frame();
 try{document.modelContext?.registerTool({name:'read_chu_adventure_progress',description:'Read the current chapter, completed discoveries and next objective in Chu’s adventure.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:true},execute(input){if(!input||typeof input!=='object'||Object.keys(input).length)throw new Error('Expected an empty object');return {state,chapter:chapter+1,chapterName:chapters[chapter].name,completed:[...completed],badges:[...badges],nextObjective:items.find(i=>i.required&&!completed.has(i.id))?.title||'Điểm cuối chặng',checkpoint:'Start of chapter, on this device'};}});}catch(e){console.warn('Progress integration unavailable',e);}

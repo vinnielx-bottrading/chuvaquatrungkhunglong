@@ -1,9 +1,9 @@
 # Chu và Quả Trứng Thất Lạc
 
-## Phiên bản 1.2 — Bản đầu để chơi và điều chỉnh
+## Phiên bản 1.3 — Bản đầu để chơi và điều chỉnh
 Game khám phá 3D low-poly bằng tiếng Việt, dành cho trẻ chơi cùng phụ huynh. Chu đọc truyện khủng long, nhận ra một ngọn núi quen thuộc, xin phép và cùng bố lên đường. Trẻ tập quan sát, giải câu đố, nhận biết tình huống nguy hiểm và nhờ người lớn hỗ trợ.
 
-Bản 1.2 có một hành trình hoàn chỉnh gồm 4 chặng. Thời lượng thiết kế hướng tới khoảng 10–15 phút khi đọc và khám phá; chưa đo thời gian chơi với trẻ thực tế, người chơi biết đáp án có thể hoàn thành nhanh hơn.
+Bản 1.3 có một hành trình hoàn chỉnh gồm 4 chặng. Thời lượng thiết kế hướng tới khoảng 10–15 phút khi đọc và khám phá; chưa đo thời gian chơi với trẻ thực tế, người chơi biết đáp án có thể hoàn thành nhanh hơn.
 
 ## Đưa lên GitHub
 Giải nén và tải toàn bộ nội dung lên thư mục gốc repository, nhánh main. Đặt `index.html`, `game.js`, `audio.js`, `style.css`, thư mục `vendor/` và `licenses/` cùng cấp. Không đặt thêm thư mục bao ngoài. Không cần build.
@@ -128,3 +128,11 @@ Bối cảnh khủng long và khu bảo tồn là hư cấu. Chu không tự xu�
 - Đây là âm thanh tổng hợp nguyên bản, không phải bản thu thực địa hoặc bài nhạc có sẵn. Không cần thêm file MP3, internet tải âm thanh hoặc giấy phép bản ghi bên ngoài.
 
 - **1.2 — 2026-10-04:** thêm nhạc nền, tiếng chim, suối theo khoảng cách và tiếng mưa; bật sau thao tác đầu tiên, nút bật/tắt và tự ngưng khi rời trang.
+
+## Khủng long và lối hang — 1.3
+- Thung lũng có 7 khủng long với kích thước và màu sắc khác nhau.
+- Mỗi con có chu kỳ riêng: đi chậm, dừng, cúi cổ ăn cỏ, nhai rồi ngẩng đầu và đi trở lại. Chân chuyển động luân phiên, đuôi đung đưa.
+- Đàn đi trong khu vực quan sát riêng, không thay đổi các nhiệm vụ về giữ khoảng cách với động vật.
+- Khủng long mẹ và con ở cảnh kết có cử động nhẹ tại chỗ.
+- Cổng vào hang và khung cửa cuối hang chuyển thành vòm đá bất quy tắc, có mảng rêu, dây leo, đèn và ánh sáng trong hang.
+- **1.3 — 2026-10-05:** bổ sung đàn khủng long, chu kỳ đi/ăn cỏ và thay cổng chữ nhật bằng vòm hang đá.
