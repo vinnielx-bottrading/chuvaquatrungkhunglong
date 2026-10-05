@@ -1,6 +1,6 @@
 # Chu và Quả Trứng Thất Lạc
 
-## Phiên bản 1.4.1 — Bản đầu để chơi và điều chỉnh
+## Phiên bản 1.4.2 — Bản đầu để chơi và điều chỉnh
 Game khám phá 3D low-poly bằng tiếng Việt, dành cho trẻ chơi cùng phụ huynh. Chu đọc truyện khủng long, nhận ra một ngọn núi quen thuộc, xin phép và cùng bố lên đường. Trẻ tập quan sát, giải câu đố, nhận biết tình huống nguy hiểm và nhờ người lớn hỗ trợ.
 
 Bản 1.4 có một hành trình hoàn chỉnh gồm 4 chặng. Thời lượng thiết kế hướng tới khoảng 10–15 phút khi đọc và khám phá; chưa đo thời gian chơi với trẻ thực tế, người chơi biết đáp án có thể hoàn thành nhanh hơn.
@@ -154,5 +154,10 @@ Giấy phép font: `licenses/NOTO-SANS-OFL.txt` (SIL Open Font License).
 - Đóng bằng nút ×, Esc, bấm lại Ủng hộ hoặc bấm ngoài hộp. Game giữ nguyên trạng thái trước khi mở.
 - Giữ các mức tiền, số tiền tùy chọn, tài khoản và nội dung QR của 1.4.
 
+## Sửa giao diện QR 1.4.2
+- Sửa nguyên nhân QR đè lên lựa chọn tiền: CSS canvas toàn cục đã được giới hạn cho canvas 3D trong #view.
+- Giữ ảnh mẫu người dùng cung cấp tại images/vietqr-card.png: VietQR, NAPAS 247, Vietcombank, tên và tài khoản. Mã QR và dòng số tiền cập nhật trên vùng riêng trong thẻ ảnh, không tràn ra ngoài.
+- Số tiền không hợp lệ sẽ ẩn toàn bộ thẻ để tránh quét nhầm mã gốc 20.000đ. Bảng vẫn nhỏ bên phải, nội dung dài cuộn trong bảng.
+
 ## GitHub
-Tải toàn bộ nội dung ZIP vào gốc repository, index.html ở gốc. GitHub Pages chọn main, /(root). Không cần build.
+Tải nội dung ZIP vào gốc repository, index.html ở gốc. GitHub Pages chọn main, /(root).
