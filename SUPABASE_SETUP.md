@@ -7,7 +7,7 @@ Hai dòng xác minh cuối phải có `rowsecurity = true`. Script không xóa n
 
 Bảng `chu_profiles`: tên, email, thời điểm ghi nhận đăng ký, lần hoạt động gần nhất. Hồ sơ được ghi sau đăng nhập; thông tin đăng nhập gốc vẫn nằm trong Authentication → Users.
 Bảng `chu_progress`: mỗi người một bản lưu cho Chương 1; gồm chặng (0–3), nhiệm vụ hoàn thành, nhật ký, huy hiệu, vị trí, câu đố và kết thúc.
-`chu_private.admins` dành cho quyền xem danh sách trong admin về sau; trang quản trị chưa được bổ sung trong bản cập nhật đăng nhập này.
+`chu_private.admins` dành cho quyền xem danh sách trong admin về sau; trang quản trị có ở bản 1.6; xem README_ADMIN.md và chạy admin-schema.sql.
 
 ## 2. Bật đăng nhập Google
 1. Trong Google Cloud / Google Auth Platform: chọn hoặc tạo dự án, cấu hình Branding, Audience và thông tin hỗ trợ.
@@ -57,7 +57,7 @@ values ('THAY-BANG-UUID-THAT-CUA-BAN')
 on conflict do nothing;
 ```
 Không chạy nguyên văn placeholder. Người chơi không được tự thêm mình vào bảng admins. Quyền quản trị không dựa vào user_metadata hoặc email do người chơi tự gửi.
-Hiện có thể xem người đăng ký và tiến trình bằng Supabase Table Editor. Trang admin để quản lý chương và nhạc là công việc riêng chưa triển khai trong bản này.
+Hiện có thể xem người đăng ký và tiến trình bằng Supabase Table Editor. Bản 1.6 có admin.html; xem README_ADMIN.md và chạy SQL bổ sung.
 
 ## 7. Kiểm tra sau khi cấu hình
 1. Chơi khách, hoàn thành một nhiệm vụ, chọn Thoát → Chơi tiếp: hành trình phải còn.

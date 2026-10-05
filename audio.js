@@ -6,6 +6,9 @@ export function createSoundscape(Context=globalThis.AudioContext||globalThis.web
  const music=ctx.createGain(),nature=ctx.createGain(),water=ctx.createGain();music.gain.value=.65;nature.gain.value=.65;water.gain.value=0;music.connect(master);nature.connect(master);water.connect(master);
  const delay=ctx.createDelay(2),echo=ctx.createGain();delay.delayTime.value=.34;echo.gain.value=.13;music.connect(delay);delay.connect(echo);echo.connect(master);
  const active=new Set();let enabled=true,focused=true,chapter=0,nearWater=0,rain=false,nextBeat=0,beat=0,nextBird=0,nextBubble=0,disposed=false;
+ let mix={music:.65,nature:.65,water:.7,url:''},track=null,trackReady=false,trackFailed=false;
+ function startTrack(){if(track&&enabled&&focused&&!trackFailed){const current=track;current.play().then(()=>{if(current===track)trackReady=true;}).catch(()=>{if(current===track){trackReady=false;trackFailed=true;}});}}
+ function configure(value){mix={...mix,...value};if((track?.getAttribute('src')||'')!==mix.url){if(track){track.pause();track.removeAttribute('src');track.load();}track=null;trackReady=false;trackFailed=false;if(mix.url&&globalThis.Audio){track=new Audio(mix.url);track.loop=true;track.volume=0;track.preload='auto';track.onerror=()=>{trackReady=false;trackFailed=true;};startTrack();}}}
  let rng=3481;const random=()=>{rng=(rng*1664525+1013904223)>>>0;return rng/4294967296;};
  const pan=(dest,value=0)=>{if(!ctx.createStereoPanner)return dest;const p=ctx.createStereoPanner();p.pan.value=value;p.connect(dest);return p;};
  const ramp=(param,value,time=.35)=>{const t=ctx.currentTime;param.cancelScheduledValues(t);param.setTargetAtTime(value,t,time);};
@@ -30,24 +33,24 @@ export function createSoundscape(Context=globalThis.AudioContext||globalThis.web
  function scheduleBeat(t){
   const chord=chords[Math.floor(beat/8)%chords.length];
   if(beat%4===0){for(let j=0;j<3;j++)note(hz(chord[j+1]),t+j*.045,3.3,.018,music,'sine',(j-1)*.3);note(hz(chord[0]),t,3,.028,music);}
-  if(beat%2===0){const m=melody[Math.floor(beat/2)%melody.length];note(hz(m),t,1.9,.055,music,'sine',-.13);note(hz(m)*2,t,1.05,.008,music,'sine',.13);}
+  if(beat%2===0){const m=melody[Math.floor(beat/2)%melody.length];note(hz(m+(chapter===1?-12:0)),t,1.9,.055,music,'sine',-.13);note(hz(m)*2,t,1.05,.008,music,'sine',.13);}
   beat++;
  }
  function mute(){ramp(master.gain,enabled&&focused?.72:0,.08);}
- function unlock(){if(disposed)return Promise.resolve(false);return Promise.resolve(ctx.resume()).then(()=>{nextBeat=Math.max(nextBeat,ctx.currentTime+.06);mute();return ctx.state==='running';}).catch(()=>false);}
- function setEnabled(value){enabled=!!value;mute();if(enabled&&focused)return unlock();return Promise.resolve(false);}
- function setFocused(value){focused=!!value;if(!focused){master.gain.cancelScheduledValues(ctx.currentTime);master.gain.setValueAtTime(0,ctx.currentTime);return Promise.resolve(ctx.suspend()).catch(()=>{});}return enabled?unlock():Promise.resolve(false);}
+ function unlock(){trackFailed=false;startTrack();if(disposed)return Promise.resolve(false);return Promise.resolve(ctx.resume()).then(()=>{nextBeat=Math.max(nextBeat,ctx.currentTime+.06);mute();return ctx.state==='running';}).catch(()=>false);}
+ function setEnabled(value){enabled=!!value;if(!enabled)track?.pause();else startTrack();mute();if(enabled&&focused)return unlock();return Promise.resolve(false);}
+ function setFocused(value){focused=!!value;if(!focused)track?.pause();else startTrack();if(!focused){master.gain.cancelScheduledValues(ctx.currentTime);master.gain.setValueAtTime(0,ctx.currentTime);return Promise.resolve(ctx.suspend()).catch(()=>{});}return enabled?unlock():Promise.resolve(false);}
  function update({chapter:area=0,x=0,z=20,raining=false,paused=false}={}){
   if(disposed||ctx.state!=='running'||!enabled||!focused)return;
   chapter=area;rain=raining;const t=ctx.currentTime;
   nearWater=area===0?Math.exp(-Math.abs(z)/7):area===2?Math.exp(-Math.hypot(x-9,z-1)/9)*.7:0;
-  ramp(water.gain,nearWater*.7,.5);ramp(music.gain,paused?.36:area===1?.42:.65,.5);ramp(rainLayer.amp.gain,rain?.24:0,.7);ramp(air.amp.gain,area===1?.012:.07,.7);
+  ramp(water.gain,nearWater*mix.water,.5);ramp(nature.gain,mix.nature,.5);const musicVolume=mix.music*(paused?.55:area===1?.65:1);ramp(music.gain,trackReady?0:musicVolume,.5);if(track&&trackReady)track.volume+=(musicVolume-track.volume)*.08;ramp(rainLayer.amp.gain,rain?.24:0,.7);ramp(air.amp.gain,area===1?.012:.07,.7);
   if(nextBeat<t-.3)nextBeat=t+.03;
   while(nextBeat<t+.18){scheduleBeat(nextBeat);nextBeat+=.9375;}
   if((area===0||area===2||area===3&&!rain)&&t>nextBird){bird(t+.02);nextBird=t+3.4+random()*4.5;}
   if(nearWater>.06&&t>nextBubble){bubble(t+.01);nextBubble=t+.08+random()*.25;}
  }
  function effect(freq,duration=.2,volume=.025){if(enabled&&focused&&ctx.state==='running')note(freq,ctx.currentTime+.005,duration,volume,nature);}
- function dispose(){if(disposed)return;disposed=true;for(const node of active)try{node.stop();}catch{}for(const l of [riverLow,riverHigh,air,rainLayer])l.source.stop();return ctx.close();}
- return {unlock,setEnabled,setFocused,update,effect,dispose,get context(){return ctx;},get enabled(){return enabled;}};
+ function dispose(){track?.pause();if(disposed)return;disposed=true;for(const node of active)try{node.stop();}catch{}for(const l of [riverLow,riverHigh,air,rainLayer])l.source.stop();return ctx.close();}
+ return {configure,unlock,setEnabled,setFocused,update,effect,dispose,get context(){return ctx;},get enabled(){return enabled;}};
 }

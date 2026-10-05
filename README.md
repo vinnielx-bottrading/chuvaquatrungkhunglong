@@ -1,9 +1,9 @@
 # Chu và Quả Trứng Thất Lạc
 
-## Phiên bản 1.5 — Bản đầu để chơi và điều chỉnh
+## Phiên bản 1.6 — Bản đầu để chơi và điều chỉnh
 Game khám phá 3D low-poly bằng tiếng Việt, dành cho trẻ chơi cùng phụ huynh. Chu đọc truyện khủng long, nhận ra một ngọn núi quen thuộc, xin phép và cùng bố lên đường. Trẻ tập quan sát, giải câu đố, nhận biết tình huống nguy hiểm và nhờ người lớn hỗ trợ.
 
-Bản 1.5 có một hành trình hoàn chỉnh gồm 4 chặng. Thời lượng thiết kế hướng tới khoảng 10–15 phút khi đọc và khám phá; chưa đo thời gian chơi với trẻ thực tế, người chơi biết đáp án có thể hoàn thành nhanh hơn.
+Bản 1.6 có một hành trình hoàn chỉnh gồm 4 chặng. Thời lượng thiết kế hướng tới khoảng 10–15 phút khi đọc và khám phá; chưa đo thời gian chơi với trẻ thực tế, người chơi biết đáp án có thể hoàn thành nhanh hơn.
 
 ## Chơi trực tiếp và chạy bản tải về
 - Chơi ở đường dẫn bản game được gửi cùng file.
@@ -164,5 +164,9 @@ Thêm đăng nhập Google, hồ sơ người chơi, lưu Supabase với phân q
 
 Kiểm tra mới: schema chạy lại được; PostgreSQL giả lập xác nhận RLS, chặn truy cập chéo và kiểm tra revision; game khôi phục nhiệm vụ và trạng thái an toàn. Google thật và SQL dự án thật cần được kiểm tra sau khi chủ game thiết lập.
 
+## Bản 1.6 — Trang mở đầu và quản trị
+Vào game thấy nhật ký hành trình với Chương 1 và các chương tương lai Sắp ra mắt, không tự vào Chương 1. Admin: admin.html. Hướng dẫn [README_ADMIN.md](README_ADMIN.md). Chạy admin-schema.sql sau schema.sql và cấp quyền cho UUID tài khoản Google của bạn.
+Quản lý trang đầu, chương, lịch mở, tên chặng, nhạc/âm lượng; tìm người đăng ký và xuất CSV; lưu nháp, xem trước, xuất bản, khôi phục lịch sử. Chương giới thiệu chưa có gameplay. Du, bản đồ rộng và các chương mới vẫn là hướng phát triển tiếp theo.
+
 ## GitHub / Vercel
-Tải toàn bộ nội dung ZIP vào gốc repository. index.html nằm ở gốc, không cần build. Chạy schema.sql trong Supabase và làm theo SUPABASE_SETUP.md trước khi thử đăng nhập.
+Giải nén nội dung ZIP vào gốc repository. index.html và admin.html nằm ở gốc; không cần build. Giữ các thư mục tài nguyên.
