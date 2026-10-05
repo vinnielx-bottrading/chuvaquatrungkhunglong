@@ -1,15 +1,15 @@
 # Chu và Quả Trứng Thất Lạc
 
-## Phiên bản 1.6 — Bản đầu để chơi và điều chỉnh
+## Phiên bản 1.7 — Bốn chương khám phá
 Game khám phá 3D low-poly bằng tiếng Việt, dành cho trẻ chơi cùng phụ huynh. Chu đọc truyện khủng long, nhận ra một ngọn núi quen thuộc, xin phép và cùng bố lên đường. Trẻ tập quan sát, giải câu đố, nhận biết tình huống nguy hiểm và nhờ người lớn hỗ trợ.
 
-Bản 1.6 có một hành trình hoàn chỉnh gồm 4 chặng. Thời lượng thiết kế hướng tới khoảng 10–15 phút khi đọc và khám phá; chưa đo thời gian chơi với trẻ thực tế, người chơi biết đáp án có thể hoàn thành nhanh hơn.
+Bản 1.7 có 4 chương, mỗi chương 4 chặng. Chương 2–4 chờ chủ game mở trong admin. Nội dung chi tiết nằm trong README_CHAPTERS.md; hướng dẫn nâng cấp ở cuối tài liệu này. Chưa đo thời lượng chơi với trẻ thực tế.
 
 ## Chơi trực tiếp và chạy bản tải về
 - Chơi ở đường dẫn bản game được gửi cùng file.
-- Với bản tải xuống: giải nén, mở terminal trong thư mục có README này, chạy `python3 -m http.server 8000`, rồi mở `http://localhost:8000/`.
+- Với bản tải xuống: giải nén, mở terminal trong thư mục có README này, chạy `python3 -m http.server 8000`, rồi mở `http://localhost:8000/` với ZIP GitHub. Với mã nguồn phát triển, mở `http://localhost:8000/dist/`.
 - Không mở `index.html` bằng file:// vì trình duyệt chặn ES modules.
-- Muốn đưa lên hosting tĩnh, dùng thư mục thư mục gốc làm thư mục xuất bản. Không cần build, database hoặc API key.
+- ZIP GitHub đã có index.html ở gốc: dùng preset Other trên Vercel, không cần lệnh build, thư mục xuất bản là gốc. Mã nguồn phát triển dùng dist/. Chơi khách không cần database; đăng nhập, lưu và admin dùng Supabase đã cấu hình.
 - Cần trình duyệt hỗ trợ WebGL và JavaScript. Thư viện Three.js được đóng gói tại chỗ, game không tải tài nguyên từ CDN lúc chơi.
 
 ## Điều khiển
@@ -24,7 +24,7 @@ Bản 1.6 có một hành trình hoàn chỉnh gồm 4 chặng. Thời lượng 
 
 Khi đến gần điểm sáng, nhãn hành động hiện ra. Trong hội thoại, nhấn nút để chọn. Chọn chưa phù hợp sẽ được giải thích và thử lại, không bị trừ điểm. Nhạc và âm thanh mặc định bật sau lần bấm vào game đầu tiên. Game tự tạm dừng khi chuyển tab; trên điện thoại có thể chơi dọc hoặc ngang.
 
-## Hành trình và lời giải dành cho phụ huynh
+## Chương 1 — Hành trình và lời giải dành cho phụ huynh
 ### Chặng 1 — Khu rừng thì thầm
 - Chu quan sát bụi quả tím: chọn không hái, không nếm và hỏi bố.
 - Tìm dấu chân ba ngón và chiếc lá bị gặm.
@@ -100,11 +100,11 @@ Bối cảnh khủng long và khu bảo tồn là hư cấu. Chu không tự xu�
 - Ưu tiên điều chỉnh tiếp: trải nghiệm cảm ứng, độ dài lời thoại, mật độ tình huống, chất lượng mô hình và giọng đọc.
 
 ## Cấu trúc mã nguồn
-- `index.html`: giao diện tiếng Việt.
-- `style.css`: bố cục máy tính/điện thoại.
-- `game.js`: dựng cảnh, nhân vật, bốn chặng, nhiệm vụ, điều khiển và lưu tiến trình.
-- `audio.js`: nhạc nền, chim, suối, mưa, bật/tắt và tạm ngưng âm thanh.
-- `vendor/`: Three.js 0.180.0 được đóng gói tại chỗ.
+- `dist/index.html`: giao diện tiếng Việt.
+- `dist/style.css`: bố cục máy tính/điện thoại.
+- `dist/game.js`: dựng cảnh, nhân vật, bốn chặng, nhiệm vụ, điều khiển và lưu tiến trình.
+- `dist/audio.js`: nhạc nền, chim, suối, mưa, bật/tắt và tạm ngưng âm thanh.
+- `dist/vendor/`: Three.js 0.180.0 được đóng gói tại chỗ.
 - `licenses/THREE-LICENSE.txt`: giấy phép MIT của Three.js.
 - `README.md`: hướng dẫn, giới hạn và nhật ký phiên bản.
 
@@ -135,7 +135,7 @@ Bối cảnh khủng long và khu bảo tồn là hư cấu. Chu không tự xu�
 - **1.3 — 2026-10-05:** bổ sung đàn khủng long, chu kỳ đi/ăn cỏ và thay cổng chữ nhật bằng vòm hang đá.
 
 ## Sửa font tiếng Việt — 1.4
-Thống nhất Noto Sans hỗ trợ tiếng Việt cho tiêu đề, hội thoại và nút. Font được đóng gói trong `fonts/` (đủ Latin, Latin mở rộng và tiếng Việt, trọng lượng 400/700), không phụ thuộc font trên máy người chơi hoặc Google Fonts khi chạy game. Tăng chiều cao dòng ở tiêu đề để dấu không bị cắt. Chuẩn hóa nội dung Unicode NFC.
+Thống nhất Noto Sans hỗ trợ tiếng Việt cho tiêu đề, hội thoại và nút. Font được đóng gói trong `dist/fonts/` (đủ Latin, Latin mở rộng và tiếng Việt, trọng lượng 400/700), không phụ thuộc font trên máy người chơi hoặc Google Fonts khi chạy game. Tăng chiều cao dòng ở tiêu đề để dấu không bị cắt. Chuẩn hóa nội dung Unicode NFC.
 Giấy phép font: `licenses/NOTO-SANS-OFL.txt` (SIL Open Font License).
 - **1.4 — 2026-10-05:** sửa dấu tiếng Việt bị lệch ở tiêu đề; đóng gói font và cập nhật mã phiên bản tải tài nguyên.
 
@@ -144,8 +144,8 @@ Giấy phép font: `licenses/NOTO-SANS-OFL.txt` (SIL Open Font License).
 - Chọn 20.000đ, 50.000đ, 100.000đ hoặc nhập số nguyên từ 1.000 đến 999.999.999 đồng (chỉ nhập chữ số).
 - VietQR tự cập nhật số tiền và nội dung `Ung ho game Chu`. Người nhận: NGUYEN HOANG VINH, Vietcombank, tài khoản 0111000182684; thông tin được đối chiếu từ QR gốc chủ game cung cấp.
 - QR được tạo ngay trên thiết bị, không gọi dịch vụ QR bên ngoài; không lưu thông tin thanh toán, không xác nhận giao dịch hoặc mở khóa nội dung trả phí.
-- Cấu hình người nhận và nội dung nằm trong `donate.js`. Nếu thay tài khoản, cần kiểm tra lại QR trước khi phát hành.
-- Thư viện QR: qrcode-generator của Kazuhiko Arase, MIT; mã và thông báo bản quyền tại `vendor/qrcode.mjs`, giấy phép tại `licenses/QRCODE-LICENSE.txt`.
+- Cấu hình người nhận và nội dung nằm trong `dist/donate.js`. Nếu thay tài khoản, cần kiểm tra lại QR trước khi phát hành.
+- Thư viện QR: qrcode-generator của Kazuhiko Arase, MIT; mã và thông báo bản quyền tại `dist/vendor/qrcode.mjs`, giấy phép tại `licenses/QRCODE-LICENSE.txt`.
 - Đã giải mã độc lập 6 QR (ba mức gợi ý, mức tùy ý và hai biên), đối chiếu tài khoản/ngân hàng/nội dung/số tiền và CRC QR gốc; kiểm tra từ chối số không hợp lệ. Chưa thực hiện chuyển khoản thực tế bằng ứng dụng ngân hàng. Chưa kiểm tra giao diện mới trên thiết bị/GPU thật.
 
 ## Điều chỉnh giao diện 1.4.1
@@ -156,11 +156,11 @@ Giấy phép font: `licenses/NOTO-SANS-OFL.txt` (SIL Open Font License).
 
 ## Sửa giao diện QR 1.4.2
 - Sửa nguyên nhân QR đè lên lựa chọn tiền: CSS canvas toàn cục đã được giới hạn cho canvas 3D trong #view.
-- Giữ ảnh mẫu người dùng cung cấp tại images/vietqr-card.png: VietQR, NAPAS 247, Vietcombank, tên và tài khoản. Mã QR và dòng số tiền cập nhật trên vùng riêng trong thẻ ảnh, không tràn ra ngoài.
+- Giữ ảnh mẫu người dùng cung cấp tại dist/images/vietqr-card.png: VietQR, NAPAS 247, Vietcombank, tên và tài khoản. Mã QR và dòng số tiền cập nhật trên vùng riêng trong thẻ ảnh, không tràn ra ngoài.
 - Số tiền không hợp lệ sẽ ẩn toàn bộ thẻ để tránh quét nhầm mã gốc 20.000đ. Bảng vẫn nhỏ bên phải, nội dung dài cuộn trong bảng.
 
 ## Bản 1.5 — 2026-10-05
-Thêm đăng nhập Google, hồ sơ người chơi, lưu Supabase với phân quyền từng tài khoản, nhắc khách khi thoát và bảo vệ bản lưu khi chơi nhiều thiết bị. Các file cấu hình: supabase-config.js, cloud-save.js, auth-callback.html; database: schema.sql. Trang admin chương/nhạc và các chương mới chưa nằm trong lần cập nhật này.
+Thêm đăng nhập Google, hồ sơ người chơi, lưu Supabase với phân quyền từng tài khoản, nhắc khách khi thoát và bảo vệ bản lưu khi chơi nhiều thiết bị. Các file cấu hình: dist/supabase-config.js, dist/cloud-save.js, dist/auth-callback.html; database: schema.sql. Trang admin chương/nhạc và các chương mới chưa nằm trong lần cập nhật này.
 
 Kiểm tra mới: schema chạy lại được; PostgreSQL giả lập xác nhận RLS, chặn truy cập chéo và kiểm tra revision; game khôi phục nhiệm vụ và trạng thái an toàn. Google thật và SQL dự án thật cần được kiểm tra sau khi chủ game thiết lập.
 
@@ -168,5 +168,31 @@ Kiểm tra mới: schema chạy lại được; PostgreSQL giả lập xác nh�
 Vào game thấy nhật ký hành trình với Chương 1 và các chương tương lai Sắp ra mắt, không tự vào Chương 1. Admin: admin.html. Hướng dẫn [README_ADMIN.md](README_ADMIN.md). Chạy admin-schema.sql sau schema.sql và cấp quyền cho UUID tài khoản Google của bạn.
 Quản lý trang đầu, chương, lịch mở, tên chặng, nhạc/âm lượng; tìm người đăng ký và xuất CSV; lưu nháp, xem trước, xuất bản, khôi phục lịch sử. Chương giới thiệu chưa có gameplay. Du, bản đồ rộng và các chương mới vẫn là hướng phát triển tiếp theo.
 
-## GitHub / Vercel
-Giải nén nội dung ZIP vào gốc repository. index.html và admin.html nằm ở gốc; không cần build. Giữ các thư mục tài nguyên.
+## Bản 1.6.1 — Giao diện dành cho người chơi
+- Bỏ liên kết Quản trị trên trang mở đầu; chủ game truy cập trực tiếp admin.html.
+- Thông báo lỗi đăng nhập, hồ sơ và lưu game chỉ hướng dẫn người chơi thử lại, kiểm tra kết nối và giữ trang mở để tránh mất tiến trình; không hiển thị hướng dẫn SQL, Supabase hoặc README.
+- Giữ nguyên đăng nhập và kiểm tra quyền trên trang admin. Không cần chạy thêm SQL.
+
+## Bản 1.7 — Bốn chương có nội dung chơi
+
+- Chương 1 giữ 4 chặng cũ. Chương 2–4 thêm 12 chặng, tổng 36 hoạt động mới: di chuyển tìm điểm quan sát, đọc và ghi nhật ký, chọn hành vi, ghép chuỗi ký hiệu, huy hiệu và kết thúc riêng.
+- Du xuất hiện từ Chương 2, có bước đi và đi cùng Chu, bố. Các tuyến mới dài khoảng 95 đơn vị so với khoảng 47 đơn vị của tuyến cũ, cảnh quan có núi, rừng, sông uốn lượn, cỏ và chim chuyển động. Đây là các chặng riêng, chưa phải thế giới mở liền mạch.
+- Chương 4 có 5 dáng khủng long cách điệu: Diplodocus, Triceratops, Stegosaurus, Ankylosaurus và Iguanodon; 8 cá thể trong mỗi chặng của công viên. Đi tới lui và cúi ăn cây lá. Xem SOURCES.md về cơ sở kiến thức và giới hạn mô hình.
+- Mỗi chương lưu trong một dòng tiến trình riêng; bản lưu Chương 1 được giữ. Trong bảng tài khoản, chọn chương muốn tiếp tục khi ở trang mở đầu. Không chuyển ô lưu khi đang chơi.
+- Admin có Chơi thử chương: yêu cầu đăng nhập và quyền admin; chế độ này không tự lưu tiến trình và không xuất bản cấu hình. Khách không có nút hoặc thông tin quản trị trên giao diện.
+- Bỏ chữ “Dự kiến” khỏi lời giới thiệu mặc định. Trạng thái “Sắp ra mắt” vẫn dùng cho chương chưa mở. Không tự xuất bản dữ liệu quản trị.
+
+### Nâng cấp từ bản đã thiết lập admin
+1. Giải nén ZIP và thay các file ở gốc repository GitHub (index.html nằm ngay ở gốc). Giữ nguyên domain Vercel đang dùng, không phải đổi Google callback khi domain không đổi. Không đưa cả thư mục ZIP bao ngoài vào repository.
+2. Chạy `chapters-upgrade.sql` trong SQL Editor của Supabase một lần (có thể chạy lại an toàn). Chỉ mở rộng ô lưu tiến trình, không xóa bản lưu và không đổi trạng thái chương.
+3. Vào `admin.html`, bấm **Chơi thử chương** để kiểm tra. Nội dung/names chặng mới được bổ sung vào trình chỉnh sửa khi đọc cấu hình cũ.
+4. Khi sẵn sàng, đặt chương muốn mở thành **Mở** hoặc **Hẹn lịch mở**, rồi **Xuất bản vào game**. Chỉ lưu nháp thì khách chưa nhận trạng thái mới. Chương 2–4 chưa có dấu phiên bản nội dung mới trong cấu hình cũ sẽ tiếp tục bị chặn cho đến lần xuất bản này, kể cả trước đó đã đặt Mở.
+5. Nếu tùy chỉnh lời giới thiệu trước đây, nội dung tùy chỉnh được giữ; sửa lại trong admin rồi xuất bản. Các mô tả mặc định cũ bắt đầu bằng “Dự kiến:” được thay bằng lời giới thiệu mới.
+
+Cài mới: chạy schema.sql rồi admin-schema.sql; cấu hình Google và quyền admin theo README_ADMIN.md. Bản schema.sql mới đã hỗ trợ 4 chương.
+
+### Kiểm chứng và giới hạn
+- Đã chạy mô phỏng đủ 16 chặng với Three.js, kiểm tra đường đến nhiệm vụ, đáp án sai/đúng, ghép chuỗi, khôi phục từng chương, khóa chương và nhân vật/động vật.
+- PostgreSQL mô phỏng: SQL chạy lại, lưu độc lập 4 chương, xung đột phiên bản, cách ly người chơi và quyền admin.
+- Chưa kiểm thử hình ảnh GPU trên trình duyệt thật hoặc Google/Supabase trực tiếp của chủ game. Chủ game nên chơi thử trên máy tính và điện thoại trước khi mở chương cho khách.
+- Mini-game ghép chuỗi đang làm sẽ bắt đầu lại khi tải lại; các nhiệm vụ đã hoàn thành vẫn được lưu. Khách chưa đăng nhập không lưu tiến trình.

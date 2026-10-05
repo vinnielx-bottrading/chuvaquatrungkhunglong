@@ -1,7 +1,7 @@
-# Quản trị game Chu — 1.6
+# Quản trị game Chu — 1.7
 
 ## Trang quản trị ở đâu?
-Mở `admin.html` cùng thư mục/tên miền với game, hoặc bấm **Quản trị** ở trang mở đầu.
+Mở trực tiếp `admin.html` cùng thư mục/tên miền với game. Trang người chơi không có liên kết quản trị.
 Bản hiện tại: https://chu-dinosaur-egg-demo.nguyenhoangvinh456.chatgpt.site/admin.html
 
 ## Thiết lập bắt buộc lần đầu
@@ -20,7 +20,7 @@ Không có mật khẩu mặc định hay nút tự cấp quyền. Không đưa 
 ## Chương & trang mở đầu
 Chỉnh tiêu đề, lời giới thiệu, tên/mô tả/thứ tự chương. Có Mở, Sắp ra mắt, Hẹn lịch mở, Tạm khóa, Ẩn. Nhập giờ theo Việt Nam UTC+7; database lưu UTC. Trang đầu lấy mốc giờ server và kiểm tra cấu hình mỗi phút.
 
-Chương 1 chứa bốn chặng hiện tại; có thể đổi tên chặng nhưng chưa đổi thứ tự gameplay. Chương 2, 3, 4 là thẻ giới thiệu dự kiến, chưa có bản đồ/nhiệm vụ. Thêm chương giới thiệu không tự tạo game; dù chọn Mở, chương chưa có code vẫn hiện Sắp ra mắt.
+Chương 1–4 đều có bốn chặng; có thể đổi tên chặng nhưng chưa đổi thứ tự gameplay. Nút Chơi thử chương mở nội dung cho admin mà không phát hành. Thêm chương ngoài bốn chương này chỉ tạo thẻ giới thiệu, không tự tạo nội dung chơi.
 
 Khóa áp dụng cho bắt đầu/khôi phục qua giao diện, không ngắt người đang chơi. Đây là quản lý phát hành giao diện, không phải DRM/paywall cho tài nguyên đã tải. Mất mạng dùng cấu hình công khai đã nhận gần nhất; chưa từng nhận cấu hình thì dùng bản mặc định với Chương 1 mở. Không dùng cơ chế này để bảo vệ nội dung bí mật/trả phí.
 
@@ -49,5 +49,15 @@ Tìm tên/email, 50 hồ sơ/trang, xem ngày ghi nhận, hoạt động đã gh
 - Dùng lại chu_profiles, chu_progress, chu_private.admins của bản 1.5.
 
 ## Kiểm chứng và giới hạn
-Đã chạy SQL hai lần trên PostgreSQL WASM/PGlite mô phỏng auth/storage, kiểm tra chặn người thường xuất bản/tải nhạc, khách không đọc bản nháp, xuất bản tạo lịch sử, chống bản nháp cũ. Kiểm tra lịch mở/khóa/chương chưa xây dựng; game bốn chặng qua DOM/renderer giả lập; âm thanh mặc định render offline không clipping.
+Đã chạy SQL hai lần trên PostgreSQL WASM/PGlite mô phỏng auth/storage, kiểm tra chặn người thường xuất bản/tải nhạc, khách không đọc bản nháp, xuất bản tạo lịch sử, chống bản nháp cũ. Kiểm tra lịch mở/khóa/chương chưa xây dựng; game 16 chặng qua DOM/renderer giả lập; âm thanh mặc định render offline không clipping.
 Chưa chạy SQL trên dự án thật, chưa kiểm tra Google/tải nhạc/UI trình duyệt thật. Sau thiết lập hãy thử: lưu nháp không đổi game; xuất bản có đổi; khóa/mở chương; chọn nhạc; đăng nhập bằng tài khoản không có quyền. Quyền chia sẻ Sites được giữ nguyên.
+
+## Cập nhật 1.7: mở Chương 2–4 khi bạn sẵn sàng
+
+Chạy `chapters-upgrade.sql` sau bộ SQL đã cài trước đây. Không cần tạo lại tài khoản hay cấp lại admin.
+
+Chương 1–4 đều có 4 chặng chơi. Mở trang admin, dùng **Chơi thử chương** để mở tab kiểm tra riêng (chỉ admin, không lưu tiến trình). Sau khi kiểm tra, chọn **Mở** / **Hẹn lịch mở**, bấm **Xuất bản vào game**. Bạn có thể giữ chương khác ở Sắp ra mắt, Tạm khóa hoặc Ẩn. Việc tải ZIP lên GitHub không tự xuất bản cấu hình chương mới.
+
+Lần đọc cấu hình cũ bổ sung tên 4 chặng và lời giới thiệu mặc định mới vào trình chỉnh sửa. Lưu nháp/đăng lại để lưu các cập nhật này vào database. Bản công khai cũ vẫn quyết định lịch phát hành, âm thanh và trạng thái. Lịch sử cũ được giữ; khi khôi phục, kiểm tra trạng thái rồi mới xuất bản.
+
+Danh sách người chơi hiển thị các bản lưu theo từng chương. Nhạc chương/chặng áp dụng cho cả 4 chương. Tất cả thiết lập quản trị chỉ hiện tại admin.html, không có liên kết từ trang khách.

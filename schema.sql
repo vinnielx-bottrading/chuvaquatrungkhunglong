@@ -24,12 +24,14 @@ create table if not exists public.chu_profiles (
 );
 create table if not exists public.chu_progress (
  user_id uuid not null references auth.users(id) on delete cascade,
- chapter_id text not null default 'chapter-1' check(chapter_id='chapter-1'),
+ chapter_id text not null default 'chapter-1' check(chapter_id in ('chapter-1','chapter-2','chapter-3','chapter-4')),
  snapshot jsonb not null check(jsonb_typeof(snapshot)='object' and octet_length(snapshot::text)<=65536),
  revision bigint not null default 1 check(revision>0),
  updated_at timestamptz not null default now(),
  primary key(user_id,chapter_id)
 );
+alter table public.chu_progress drop constraint if exists chu_progress_chapter_id_check;
+alter table public.chu_progress add constraint chu_progress_chapter_id_check check(chapter_id in ('chapter-1','chapter-2','chapter-3','chapter-4'));
 alter table public.chu_profiles enable row level security;
 alter table public.chu_progress enable row level security;
 revoke all on public.chu_profiles,public.chu_progress from public,anon,authenticated;
@@ -59,13 +61,13 @@ language plpgsql security invoker set search_path='' as $$
 declare saved public.chu_progress;
 begin
  if auth.uid() is null or coalesce(auth.jwt()->>'is_anonymous','false')='true' then raise exception 'CHU_LOGIN_REQUIRED'; end if;
- if p_snapshot is null or p_snapshot->>'version' is distinct from '2' or p_snapshot->>'chapterId' is distinct from 'chapter-1' or p_expected_revision is null or p_expected_revision<0 then raise exception 'CHU_INVALID_PROGRESS'; end if;
+ if p_snapshot is null or p_snapshot->>'version' is distinct from '2' or coalesce(p_snapshot->>'chapterId','') not in ('chapter-1','chapter-2','chapter-3','chapter-4') or p_expected_revision is null or p_expected_revision<0 then raise exception 'CHU_INVALID_PROGRESS'; end if;
  if p_expected_revision=0 then
-  insert into public.chu_progress(user_id,chapter_id,snapshot) values(auth.uid(),'chapter-1',p_snapshot)
+  insert into public.chu_progress(user_id,chapter_id,snapshot) values(auth.uid(),p_snapshot->>'chapterId',p_snapshot)
   on conflict(user_id,chapter_id) do nothing returning * into saved;
  else
   update public.chu_progress set snapshot=p_snapshot,revision=revision+1,updated_at=now()
-  where user_id=auth.uid() and chapter_id='chapter-1' and revision=p_expected_revision returning * into saved;
+  where user_id=auth.uid() and chapter_id=p_snapshot->>'chapterId' and revision=p_expected_revision returning * into saved;
  end if;
  if saved.user_id is null then raise exception 'CHU_CONFLICT'; end if;
  return jsonb_build_object('snapshot',saved.snapshot,'revision',saved.revision,'updated_at',saved.updated_at);
