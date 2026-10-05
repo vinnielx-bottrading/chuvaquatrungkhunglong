@@ -1,12 +1,12 @@
 # Chu và Quả Trứng Thất Lạc
 
-## Phiên bản 1.3 — Bản đầu để chơi và điều chỉnh
+## Phiên bản 1.3.1 — Bản đầu để chơi và điều chỉnh
 Game khám phá 3D low-poly bằng tiếng Việt, dành cho trẻ chơi cùng phụ huynh. Chu đọc truyện khủng long, nhận ra một ngọn núi quen thuộc, xin phép và cùng bố lên đường. Trẻ tập quan sát, giải câu đố, nhận biết tình huống nguy hiểm và nhờ người lớn hỗ trợ.
 
-Bản 1.3 có một hành trình hoàn chỉnh gồm 4 chặng. Thời lượng thiết kế hướng tới khoảng 10–15 phút khi đọc và khám phá; chưa đo thời gian chơi với trẻ thực tế, người chơi biết đáp án có thể hoàn thành nhanh hơn.
+Bản 1.3.1 có một hành trình hoàn chỉnh gồm 4 chặng. Thời lượng thiết kế hướng tới khoảng 10–15 phút khi đọc và khám phá; chưa đo thời gian chơi với trẻ thực tế, người chơi biết đáp án có thể hoàn thành nhanh hơn.
 
 ## Đưa lên GitHub
-Giải nén và tải toàn bộ nội dung lên thư mục gốc repository, nhánh main. Đặt `index.html`, `game.js`, `audio.js`, `style.css`, thư mục `vendor/` và `licenses/` cùng cấp. Không đặt thêm thư mục bao ngoài. Không cần build.
+Giải nén và tải toàn bộ nội dung lên gốc repository, nhánh main. `index.html` nằm ngoài cùng. Cần tải cả `fonts/`, `vendor/` và `licenses/`, không chỉ các file HTML/JS/CSS. Không cần build.
 
 ## Chơi trực tiếp và chạy bản tải về
 - Chơi ở đường dẫn bản game được gửi cùng file.
@@ -136,3 +136,8 @@ Bối cảnh khủng long và khu bảo tồn là hư cấu. Chu không tự xu�
 - Khủng long mẹ và con ở cảnh kết có cử động nhẹ tại chỗ.
 - Cổng vào hang và khung cửa cuối hang chuyển thành vòm đá bất quy tắc, có mảng rêu, dây leo, đèn và ánh sáng trong hang.
 - **1.3 — 2026-10-05:** bổ sung đàn khủng long, chu kỳ đi/ăn cỏ và thay cổng chữ nhật bằng vòm hang đá.
+
+## Sửa font tiếng Việt — 1.3.1
+Thống nhất Noto Sans hỗ trợ tiếng Việt cho tiêu đề, hội thoại và nút. Font được đóng gói trong `fonts/` (đủ Latin, Latin mở rộng và tiếng Việt, trọng lượng 400/700), không phụ thuộc font trên máy người chơi hoặc Google Fonts khi chạy game. Tăng chiều cao dòng ở tiêu đề để dấu không bị cắt. Chuẩn hóa nội dung Unicode NFC.
+Giấy phép font: `licenses/NOTO-SANS-OFL.txt` (SIL Open Font License).
+- **1.3.1 — 2026-10-05:** sửa dấu tiếng Việt bị lệch ở tiêu đề; đóng gói font và cập nhật mã phiên bản tải tài nguyên.
