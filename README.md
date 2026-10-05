@@ -1,18 +1,15 @@
 # Chu và Quả Trứng Thất Lạc
 
-## Phiên bản 1.3.1 — Bản đầu để chơi và điều chỉnh
+## Phiên bản 1.4 — Bản đầu để chơi và điều chỉnh
 Game khám phá 3D low-poly bằng tiếng Việt, dành cho trẻ chơi cùng phụ huynh. Chu đọc truyện khủng long, nhận ra một ngọn núi quen thuộc, xin phép và cùng bố lên đường. Trẻ tập quan sát, giải câu đố, nhận biết tình huống nguy hiểm và nhờ người lớn hỗ trợ.
 
-Bản 1.3.1 có một hành trình hoàn chỉnh gồm 4 chặng. Thời lượng thiết kế hướng tới khoảng 10–15 phút khi đọc và khám phá; chưa đo thời gian chơi với trẻ thực tế, người chơi biết đáp án có thể hoàn thành nhanh hơn.
-
-## Đưa lên GitHub
-Giải nén và tải toàn bộ nội dung lên gốc repository, nhánh main. `index.html` nằm ngoài cùng. Cần tải cả `fonts/`, `vendor/` và `licenses/`, không chỉ các file HTML/JS/CSS. Không cần build.
+Bản 1.4 có một hành trình hoàn chỉnh gồm 4 chặng. Thời lượng thiết kế hướng tới khoảng 10–15 phút khi đọc và khám phá; chưa đo thời gian chơi với trẻ thực tế, người chơi biết đáp án có thể hoàn thành nhanh hơn.
 
 ## Chơi trực tiếp và chạy bản tải về
 - Chơi ở đường dẫn bản game được gửi cùng file.
 - Với bản tải xuống: giải nén, mở terminal trong thư mục có README này, chạy `python3 -m http.server 8000`, rồi mở `http://localhost:8000/`.
 - Không mở `index.html` bằng file:// vì trình duyệt chặn ES modules.
-- Muốn đưa lên hosting tĩnh, dùng thư mục gốc repository làm thư mục xuất bản. Không cần build, database hoặc API key.
+- Muốn đưa lên hosting tĩnh, dùng thư mục thư mục gốc làm thư mục xuất bản. Không cần build, database hoặc API key.
 - Cần trình duyệt hỗ trợ WebGL và JavaScript. Thư viện Three.js được đóng gói tại chỗ, game không tải tài nguyên từ CDN lúc chơi.
 
 ## Điều khiển
@@ -137,7 +134,19 @@ Bối cảnh khủng long và khu bảo tồn là hư cấu. Chu không tự xu�
 - Cổng vào hang và khung cửa cuối hang chuyển thành vòm đá bất quy tắc, có mảng rêu, dây leo, đèn và ánh sáng trong hang.
 - **1.3 — 2026-10-05:** bổ sung đàn khủng long, chu kỳ đi/ăn cỏ và thay cổng chữ nhật bằng vòm hang đá.
 
-## Sửa font tiếng Việt — 1.3.1
+## Sửa font tiếng Việt — 1.4
 Thống nhất Noto Sans hỗ trợ tiếng Việt cho tiêu đề, hội thoại và nút. Font được đóng gói trong `fonts/` (đủ Latin, Latin mở rộng và tiếng Việt, trọng lượng 400/700), không phụ thuộc font trên máy người chơi hoặc Google Fonts khi chạy game. Tăng chiều cao dòng ở tiêu đề để dấu không bị cắt. Chuẩn hóa nội dung Unicode NFC.
 Giấy phép font: `licenses/NOTO-SANS-OFL.txt` (SIL Open Font License).
-- **1.3.1 — 2026-10-05:** sửa dấu tiếng Việt bị lệch ở tiêu đề; đóng gói font và cập nhật mã phiên bản tải tài nguyên.
+- **1.4 — 2026-10-05:** sửa dấu tiếng Việt bị lệch ở tiêu đề; đóng gói font và cập nhật mã phiên bản tải tài nguyên.
+
+## Mới trong 1.4 — Ủng hộ tự nguyện
+- Nút ♡ Ủng hộ ở góc phải; mở bảng sẽ tạm dừng game. Đóng bằng × hoặc Esc sẽ quay lại đúng trạng thái chơi/hội thoại trước đó.
+- Chọn 20.000đ, 50.000đ, 100.000đ hoặc nhập số nguyên từ 1.000 đến 999.999.999 đồng (chỉ nhập chữ số).
+- VietQR tự cập nhật số tiền và nội dung `Ung ho game Chu`. Người nhận: NGUYEN HOANG VINH, Vietcombank, tài khoản 0111000182684; thông tin được đối chiếu từ QR gốc chủ game cung cấp.
+- QR được tạo ngay trên thiết bị, không gọi dịch vụ QR bên ngoài; không lưu thông tin thanh toán, không xác nhận giao dịch hoặc mở khóa nội dung trả phí.
+- Cấu hình người nhận và nội dung nằm trong `donate.js`. Nếu thay tài khoản, cần kiểm tra lại QR trước khi phát hành.
+- Thư viện QR: qrcode-generator của Kazuhiko Arase, MIT; mã và thông báo bản quyền tại `vendor/qrcode.mjs`, giấy phép tại `licenses/QRCODE-LICENSE.txt`.
+- Đã giải mã độc lập 6 QR (ba mức gợi ý, mức tùy ý và hai biên), đối chiếu tài khoản/ngân hàng/nội dung/số tiền và CRC QR gốc; kiểm tra từ chối số không hợp lệ. Chưa thực hiện chuyển khoản thực tế bằng ứng dụng ngân hàng. Chưa kiểm tra giao diện mới trên thiết bị/GPU thật.
+
+## Đưa lên GitHub
+Giải nén và tải trực tiếp toàn bộ nội dung vào thư mục gốc repository (index.html ở gốc). Với GitHub Pages, chọn nhánh main và /(root). Không cần npm install hoặc build.
