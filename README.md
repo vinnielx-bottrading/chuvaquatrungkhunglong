@@ -1,9 +1,9 @@
 # Chu và Quả Trứng Thất Lạc
 
-## Phiên bản 1.4.2 — Bản đầu để chơi và điều chỉnh
+## Phiên bản 1.5 — Bản đầu để chơi và điều chỉnh
 Game khám phá 3D low-poly bằng tiếng Việt, dành cho trẻ chơi cùng phụ huynh. Chu đọc truyện khủng long, nhận ra một ngọn núi quen thuộc, xin phép và cùng bố lên đường. Trẻ tập quan sát, giải câu đố, nhận biết tình huống nguy hiểm và nhờ người lớn hỗ trợ.
 
-Bản 1.4 có một hành trình hoàn chỉnh gồm 4 chặng. Thời lượng thiết kế hướng tới khoảng 10–15 phút khi đọc và khám phá; chưa đo thời gian chơi với trẻ thực tế, người chơi biết đáp án có thể hoàn thành nhanh hơn.
+Bản 1.5 có một hành trình hoàn chỉnh gồm 4 chặng. Thời lượng thiết kế hướng tới khoảng 10–15 phút khi đọc và khám phá; chưa đo thời gian chơi với trẻ thực tế, người chơi biết đáp án có thể hoàn thành nhanh hơn.
 
 ## Chơi trực tiếp và chạy bản tải về
 - Chơi ở đường dẫn bản game được gửi cùng file.
@@ -60,13 +60,13 @@ Tinh thần của game là tò mò, biết quan sát, dừng lại khi chưa ch�
 
 Bối cảnh khủng long và khu bảo tồn là hư cấu. Chu không tự xuống suối, đẩy cây, vào hang lạ, tiếp cận động vật hoặc tự chuyển trứng. Các ví dụ trong game không thay thế giám sát của người lớn và hướng dẫn tại địa điểm ngoài đời.
 
-## Lưu tiến trình
-- Tự lưu **đầu mỗi chặng** vào localStorage của trình duyệt trên thiết bị hiện tại.
-- Mở lại game có lựa chọn tiếp tục từ đầu chặng đã lưu hoặc bắt đầu chuyến đi mới.
-- Đóng trang giữa chặng sẽ phải chơi lại chặng đó; các ghi chú và huy hiệu của các chặng trước được giữ.
-- Không có tài khoản và không đồng bộ giữa điện thoại, máy tính hoặc trình duyệt khác nhau.
-- Chơi lại từ đầu có bước xác nhận và thay tiến trình cũ trên thiết bị đó.
-- Nếu trình duyệt chặn lưu trữ, game báo và vẫn cho chơi tiếp.
+## Lưu tiến trình — Google / Supabase
+- **Cần chạy schema.sql và bật Google trước khi lưu trực tuyến.** Xem hướng dẫn chi tiết trong [SUPABASE_SETUP.md](SUPABASE_SETUP.md).
+- Chưa đăng nhập: chơi tạm trong bộ nhớ, không lưu trên máy. Thoát hoặc tải lại sẽ mất tiến trình; có nhắc khi bấm Thoát.
+- Đăng nhập Google: lưu nhiệm vụ, vị trí, nhật ký, huy hiệu và chặng lên tài khoản; có thể tiếp tục trên thiết bị khác.
+- Đăng nhập mở cửa sổ riêng để giữ hành trình khách. Có bản lưu cũ thì người chơi chọn bản muốn giữ.
+- Đồng bộ sau nhiệm vụ và mỗi 15 giây. Khi lỗi mạng hoặc SQL chưa cấu hình, game báo chưa lưu và cho thử lại.
+- Bốn chặng hiện tại đều thuộc **Chương 1: Quả trứng thất lạc**.
 
 ## Đã có trong phiên bản này
 - 4 khu vực 3D khác nhau: rừng, hang, thung lũng, đường núi có điểm trú.
@@ -159,5 +159,10 @@ Giấy phép font: `licenses/NOTO-SANS-OFL.txt` (SIL Open Font License).
 - Giữ ảnh mẫu người dùng cung cấp tại images/vietqr-card.png: VietQR, NAPAS 247, Vietcombank, tên và tài khoản. Mã QR và dòng số tiền cập nhật trên vùng riêng trong thẻ ảnh, không tràn ra ngoài.
 - Số tiền không hợp lệ sẽ ẩn toàn bộ thẻ để tránh quét nhầm mã gốc 20.000đ. Bảng vẫn nhỏ bên phải, nội dung dài cuộn trong bảng.
 
-## GitHub
-Tải nội dung ZIP vào gốc repository, index.html ở gốc. GitHub Pages chọn main, /(root).
+## Bản 1.5 — 2026-10-05
+Thêm đăng nhập Google, hồ sơ người chơi, lưu Supabase với phân quyền từng tài khoản, nhắc khách khi thoát và bảo vệ bản lưu khi chơi nhiều thiết bị. Các file cấu hình: supabase-config.js, cloud-save.js, auth-callback.html; database: schema.sql. Trang admin chương/nhạc và các chương mới chưa nằm trong lần cập nhật này.
+
+Kiểm tra mới: schema chạy lại được; PostgreSQL giả lập xác nhận RLS, chặn truy cập chéo và kiểm tra revision; game khôi phục nhiệm vụ và trạng thái an toàn. Google thật và SQL dự án thật cần được kiểm tra sau khi chủ game thiết lập.
+
+## GitHub / Vercel
+Tải toàn bộ nội dung ZIP vào gốc repository. index.html nằm ở gốc, không cần build. Chạy schema.sql trong Supabase và làm theo SUPABASE_SETUP.md trước khi thử đăng nhập.
