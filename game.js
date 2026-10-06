@@ -1,3 +1,4 @@
+import {TerrainCollisions,insideMeadow,addMeadow} from './terrain.js';
 import {adventures,implementedIds} from './adventures.js';
 import {buildAdventureWorld} from './adventure-world.js';
 import { mountCover, catalog, available, currentAudio } from './catalog.js';
@@ -9,22 +10,22 @@ const $=id=>document.getElementById(id);
 let renderer;
 try{renderer=new T.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance'});}catch(e){$('error').hidden=false;throw e;}
 renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;renderer.setClearColor(0xa9c9a7);renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;$('view').appendChild(renderer.domElement);
-const scene=new T.Scene();scene.fog=new T.Fog(0xb3cba8,40,100);
-const camera=new T.OrthographicCamera(-16,16,12,-12,.1,130);const look=new T.Vector3();
+const scene=new T.Scene();scene.fog=new T.Fog(0xb3cba8,90,240);
+const camera=new T.PerspectiveCamera(55,innerWidth/innerHeight,.1,450);const look=new T.Vector3();
 scene.add(new T.HemisphereLight(0xfdf2cd,0x365e48,2.3));const sun=new T.DirectionalLight(0xffe1a0,3);sun.position.set(-16,30,12);sun.castShadow=true;sun.shadow.mapSize.set(1536,1536);Object.assign(sun.shadow.camera,{left:-32,right:32,top:32,bottom:-32,near:1,far:80});sun.shadow.bias=-.0004;scene.add(sun);
 const materials=new Map();function mat(c){if(!materials.has(c))materials.set(c,new T.MeshStandardMaterial({color:c,roughness:.95,flatShading:true}));return materials.get(c);}
 function mesh(geo,color,parent=scene,x=0,y=0,z=0){const m=new T.Mesh(geo,mat(color));m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m;}
-function ball(parent,c,x,y,z,sx,sy=sx,sz=sx){const m=mesh(new T.IcosahedronGeometry(1,1),c,parent,x,y,z);m.scale.set(sx,sy,sz);return m;}
-function box(parent,c,x,y,z,w,h,d){return mesh(new T.BoxGeometry(w,h,d),c,parent,x,y,z);}
-function cyl(parent,c,x,y,z,r1,r2,h,n=7){return mesh(new T.CylinderGeometry(r1,r2,h,n),c,parent,x,y,z);}
+function ball(parent,c,x,y,z,sx,sy=sx,sz=sx){const m=mesh(new T.IcosahedronGeometry(1,1),c,parent,x,y,z);m.scale.set(sx,sy,sz);if((parent===scene||parent.userData.terrainRoot)&&sy>=.35&&sx>=.65)m.userData.solid=true;return m;}
+function box(parent,c,x,y,z,w,h,d){const m=mesh(new T.BoxGeometry(w,h,d),c,parent,x,y,z);if(h>=.3||(y>.55&&Math.max(w,d)>.7&&h>.08)||(y>.75&&Math.max(w,d)>2))m.userData.solid=true;return m;}
+function cyl(parent,c,x,y,z,r1,r2,h,n=7){const m=mesh(new T.CylinderGeometry(r1,r2,h,n),c,parent,x,y,z);if(h>=1&&Math.max(r1,r2)>=.06)m.userData.solid=true;return m;}
 // Ground continues far beyond the playable trail; no exposed rectangular slab.
 function landscape(parent,color,woodland=false){
- const ground=mesh(new T.CircleGeometry(160,96),color,parent,0,-.035,0);ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;ground.castShadow=false;
+ const ground=mesh(new T.CircleGeometry(245,96),color,parent,0,-.035,0);ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;ground.castShadow=false;
  const temp=new T.Object3D();const palette=woodland?[0x51724c,0x6e895d,0x829772]:[0x788979,0x8d9c88,0xa0aa91];
- for(let i=0;i<24;i++){const a=i/24*Math.PI*2,r=42+8*Math.sin(i*2.31),h=4+4*(.5+.5*Math.sin(i*1.73));const hill=ball(parent,palette[i%3],Math.cos(a)*r,h*.12,Math.sin(a)*r,9+(i%4)*2,h,9+(i%3)*3);hill.castShadow=false;}
+ for(let i=0;i<24;i++){const a=i/24*Math.PI*2,r=132+12*Math.sin(i*2.31),h=4+4*(.5+.5*Math.sin(i*1.73));const hill=ball(parent,palette[i%3],Math.cos(a)*r,h*.12,Math.sin(a)*r,9+(i%4)*2,h,9+(i%3)*3);hill.castShadow=false;}
  if(woodland){
   const trunks=new T.InstancedMesh(new T.CylinderGeometry(.16,.32,3.2,5),mat(0x735e41),100);const crowns=new T.InstancedMesh(new T.IcosahedronGeometry(1,0),mat(0x3e714a),100);
-  for(let i=0;i<100;i++){const a=i*2.399963,r=29+(i%9)*3.8,x=Math.cos(a)*r,z=Math.sin(a)*r,k=.8+(i%5)*.17;
+  for(let i=0;i<100;i++){const a=i*2.399963,r=135+(i%9)*4.8,x=Math.cos(a)*r,z=Math.sin(a)*r,k=.8+(i%5)*.17;
    temp.position.set(x,1.6*k,z);temp.scale.set(k,k,k);temp.rotation.set(0,a,0);temp.updateMatrix();trunks.setMatrixAt(i,temp.matrix);
    temp.position.y=4.2*k;temp.scale.set(1.65*k,2.5*k,1.6*k);temp.updateMatrix();crowns.setMatrixAt(i,temp.matrix);
   }parent.add(trunks,crowns);trunks.castShadow=false;crowns.castShadow=false;
@@ -63,7 +64,7 @@ const logMarker=marker(0,3.1),eggMarker=marker(0,-16.5);eggMarker.position.y=2;m
 // A trusted adult accompanies Chu from the beginning.
 const adultRigs=new WeakMap();
 function createAdult(shirtColor=0x477f9c){
- const g=new T.Group(),torso=new T.Group();g.add(torso);torso.name='adult-torso';
+ const g=new T.Group(),torso=new T.Group();g.userData.movingBody=true;g.add(torso);torso.name='adult-torso';
  ball(torso,shirtColor,0,1.55,0,.45,.55,.3);box(torso,0x324e60,0,1.12,0,.62,.16,.34);
  const headRig=new T.Group();headRig.position.y=2.25;torso.add(headRig);
  ball(headRig,0xe5b68b,0,0,0,.33,.39,.31);ball(headRig,0x363330,0,.25,-.04,.35,.19,.32);
@@ -88,7 +89,7 @@ const fireflies=[];for(let i=0;i<22;i++){const m=ball(scene,0xf5dc8f,(rand()-.5)
 const forestNodes=scene.children.filter(n=>n!==chu&&n!==father&&!n.isLight);
 const forestBlockers=blockers.map(b=>({...b}));
 const baseGeometries=new Set(),baseMaterials=new Set();scene.traverse(n=>{if(n.geometry)baseGeometries.add(n.geometry);if(n.material)baseMaterials.add(n.material);});
-const world=new T.Group();scene.add(world);
+const world=new T.Group();world.userData.terrainRoot=true;scene.add(world);const terrainCollisions=new TerrainCollisions();let followTrail=[];
 const hemi=scene.children.find(n=>n.isHemisphereLight);
 const chapters=[
  {name:'Khu rừng thì thầm',subtitle:'Bắt đầu bằng những điều nhỏ bé.',badge:'Biết quan sát',color:0xa9c9a7},
@@ -145,7 +146,7 @@ function restoreProgress(s){if(!s||!canPlay(s.chapterId))return false;
  bridge=adventureId==='chapter-1'&&chapter===0&&completed.has('river');if(bridge){gate.visible=false;logMarker.visible=false;}
  flashlightOn=adventureId==='chapter-1'&&chapter===1&&completed.has('lamp');
  raining=adventureId==='chapter-1'&&chapter===3&&completed.has('weather')&&!completed.has('shelter');if(rainMesh)rainMesh.visible=raining;if(raining){sun.intensity=.65;renderer.setClearColor(0x8a9ca4);}
- if(legal(s.position.x,s.position.z))chu.position.set(s.position.x,0,s.position.z);father.position.set(chu.position.x+1,0,chu.position.z+1);adultRigs.get(father).previous.copy(father.position);look.copy(chu.position);quest();resume();if(finishedRun){if(finalEgg)finalEgg.visible=true;if(baby)baby.visible=true;if(cart)cart.visible=false;state='epilogue';}return true;
+ if(legal(s.position.x,s.position.z))chu.position.set(s.position.x,0,s.position.z);father.position.set(chu.position.x+1,0,chu.position.z+1);adultRigs.get(father).previous.copy(father.position);look.copy(chu.position);followTrail=[{x:chu.position.x,z:chu.position.z}];quest();resume();if(finishedRun){if(finalEgg)finalEgg.visible=true;if(baby)baby.visible=true;if(cart)cart.visible=false;state='epilogue';}return true;
 }
 function showWelcome(){state='cover';$('modal').classList.add('hidden');$('cover').hidden=false;document.body.classList.add('coverMode');keys.clear();release();}
 function resetRun(){started=false;finishedRun=false;chapter=0;notes=[];badges=[];totalPlay=0;buildChapter();showWelcome();}
@@ -158,7 +159,7 @@ function introStory(){if(adventureId!=='chapter-1'){dialog('CHƯƠNG '+adventure
 function smallSign(parent,x,z){const g=new T.Group();g.position.set(x,0,z);parent.add(g);box(g,0x6b5741,0,.6,0,.12,1.2,.12);box(g,0xdfc892,0,1.15,0,.75,.5,.1);return g;}
 function rope(parent,x,z,length){for(let n=0;n<=length;n+=2.5)cyl(parent,0x927659,x,.65,z-n,.065,.09,1.3,5);box(parent,0xc6b587,x,1.05,z-length/2,.045,.045,length);}
 function cloneDino(x,z,scale=1,options={}){
- const g=new T.Group();g.position.set(x,0,z);g.scale.setScalar(scale);world.add(g);
+ const g=new T.Group();g.userData.movingBody=true;g.position.set(x,0,z);g.scale.setScalar(scale);world.add(g);
  const colors=options.colors||[0x7f9d6b,0xaac283];const trunk=new T.Group();g.add(trunk);ball(trunk,colors[0],0,1.65,0,1.25,1,1.9);ball(trunk,colors[1],0,1.24,.5,.93,.64,1.45);
  const legs=[];for(const lx of [-.8,.8])for(const lz of [-1.05,1.05]){const leg=new T.Group();leg.position.set(lx,1.3,lz);g.add(leg);cyl(leg,colors[0],0,-.55,0,.25,.33,1.1);ball(leg,0x647b55,0,-1.15,.06,.37,.16,.43);legs.push(leg);}
  const neckRig=new T.Group();neckRig.position.set(0,1.95,1.3);trunk.add(neckRig);const n=ball(neckRig,colors[0],0,1.15,.2,.48,1.55,.55);n.rotation.x=.12;
@@ -210,20 +211,20 @@ function buildValley(){
  const lake=ball(world,0x63b6c4,9,.02,1,5.5,.03,8);lake.castShadow=false;
  for(let i=0;i<35;i++){const x=(rand()-.5)*40,z=(rand()-.5)*48;if(Math.abs(x)<6||Math.hypot(x-9,z-1)<9)continue;ball(world,0x799355,x,.4,z,.7,.65,.8);if(i%3===0)ball(world,0xb9bd87,x,.2,z,1.2,.5,1.2);}
  for(let i=0;i<9;i++)ball(world,0x90a78a,-20+i*5,3,-26,4,4+rand()*4,4);
- cloneDino(-10.8,7,.86,{offset:0,rx:.45,rz:1.5});cloneDino(-15.8,12,1.02,{offset:6,colors:[0x8e9a69,0xc0c48b]});cloneDino(-17,2,.67,{offset:13,colors:[0x78968a,0xb2c8a0]});cloneDino(-11.5,-5,.8,{offset:19,rx:.4});cloneDino(-17,-10,1.1,{offset:9,colors:[0x939774,0xc8c699]});cloneDino(-11.8,-15,.55,{offset:3});cloneDino(-20,19,.7,{offset:16,colors:[0x8e9675,0xc1c7a3]});rope(world,-5.4,14,31);rope(world,3.9,8,15);
+ cloneDino(-10.8,7,.86,{offset:0,rx:.45,rz:1.5});cloneDino(-15.8,12,1.02,{offset:6,colors:[0x8e9a69,0xc0c48b]});cloneDino(-17,2,.67,{offset:13,colors:[0x78968a,0xb2c8a0]});cloneDino(-11.5,-5,.8,{offset:19,rx:.4});cloneDino(-17,-10,1.1,{offset:9,colors:[0x939774,0xc8c699]});cloneDino(-11.8,-15,.55,{offset:3});cloneDino(-20,19,.7,{offset:16,colors:[0x8e9675,0xc1c7a3]});rope(world,-5.4,24,46);rope(world,-24,24,46);box(world,0xc6b587,-14.7,1.05,24,18.6,.08,.08);box(world,0xc6b587,-14.7,1.05,-22,18.6,.08,.08);rope(world,3.9,8,15);
  smallSign(world,0,-5);box(world,0x4d7e62,.15,1.2,-5,.9,.14,.09);box(world,0xb37f59,-.25,.95,-5,.8,.13,.09);
  makeEgg(3,-13);ranger=createAdult(0x778365);ranger.position.set(5,0,-13);world.add(ranger);cyl(ranger,0xb8a774,0,2.55,0,.52,.52,.06,10);cyl(ranger,0xb8a774,0,2.67,0,.32,.36,.22,10);
  smallSign(world,-3,10);smallSign(world,3,3);smallSign(world,0,-21);
 }
 function buildMountain(){
  commonGround(0x8f9879,0xc3b187);hemi.intensity=2;sun.intensity=2.1;
- rope(world,-5.7,24,48);rope(world,5.7,24,48);
- for(let i=0;i<24;i++){const x=(i%2?-1:1)*(8+rand()*8),z=(rand()-.5)*55;ball(world,0x7d877a,x,1,z,2+rand()*2,2+rand()*4,2);}
+
+ for(let i=0;i<12;i++){const x=(i%2?-1:1)*(28+rand()*25),z=(rand()-.5)*105;ball(world,0x7d877a,x,1,z,2+rand()*2,2+rand()*4,2);}
  const hut=new T.Group();hut.position.set(-2,0,-1);world.add(hut);box(hut,0x826a4b,0,1.2,-1.35,4.4,2.4,.2);box(hut,0xa08c63,-2.1,1.2,0,.2,2.4,2.7);box(hut,0xa08c63,2.1,1.2,0,.2,2.4,2.7);const roof=mesh(new T.ConeGeometry(3.5,1.2,4),0x506b62,hut,0,2.9,0);roof.rotation.y=Math.PI/4;box(hut,0xc2a879,0,.35,-.7,2.8,.25,.6);
  finalEgg=makeEgg(0,-23);finalEgg.visible=false;cloneDino(-4,-25,.9,{walk:false});baby=cloneDino(1.2,-22.7,.19,{walk:false});baby.visible=false;
  rope(world,-5.7,-17,0);box(world,0x9c8257,0,1.1,-18,11.4,.1,.1);
  for(let i=0;i<20;i++){const a=i/20*Math.PI*2;const twig=box(world,0x806845,Math.cos(a)*2,.12,-23+Math.sin(a)*1.5,1.4,.12,.15);twig.rotation.y=-a;}
- cart=new T.Group();world.add(cart);box(cart,0xa68d66,0,.5,0,1,.15,1.6);const e=eggGroup.clone(true);e.position.set(0,.45,0);e.scale.setScalar(.55);cart.add(e);for(const x of [-.55,.55])for(const z of [-.55,.55]){const wheel=cyl(cart,0x45463d,x,.25,z,.23,.23,.12,9);wheel.rotation.z=Math.PI/2;}
+ cart=new T.Group();cart.userData.movingBody=true;world.add(cart);box(cart,0xa68d66,0,.5,0,1,.15,1.6);const e=eggGroup.clone(true);e.position.set(0,.45,0);e.scale.setScalar(.55);cart.add(e);for(const x of [-.55,.55])for(const z of [-.55,.55]){const wheel=cyl(cart,0x45463d,x,.25,z,.23,.23,.12,9);wheel.rotation.z=Math.PI/2;}
  ranger=createAdult(0x778365);world.add(ranger);cyl(ranger,0xb8a774,0,2.55,0,.5,.5,.06,10);escort=true;
  const rp=[];for(let i=0;i<320;i++)rp.push((rand()-.5)*26,rand()*14,(rand()-.5)*42);const rg=new T.BufferGeometry();rg.setAttribute('position',new T.Float32BufferAttribute(rp,3));rainMesh=new T.Points(rg,new T.PointsMaterial({color:0xc1d5db,size:.045,transparent:true,opacity:.75}));rainMesh.visible=false;world.add(rainMesh);
  smallSign(world,1.5,18);smallSign(world,1,7);smallSign(world,1,-10);
@@ -233,9 +234,9 @@ function buildChapter(){
  const removeGeo=new Set(),removeMat=new Set();world.traverse(n=>{if(n.geometry&&!baseGeometries.has(n.geometry))removeGeo.add(n.geometry);if(n.material&&!baseMaterials.has(n.material)&&![...materials.values()].includes(n.material))removeMat.add(n.material);});removeGeo.forEach(g=>g.dispose());removeMat.forEach(m=>m.dispose());world.clear();forestNodes.forEach(n=>n.visible=adventureId==='chapter-1'&&chapter===0);dino.visible=false;eggGroup.visible=false;eggMarker.visible=false;forestBlockers.forEach((b,i)=>blockers[i]=b);blockers.length=forestBlockers.length;
  for(const c of clues){c.found=false;c.marker.visible=adventureId==='chapter-1'&&chapter===0;}logMarker.visible=adventureId==='chapter-1'&&chapter===0;gate.visible=adventureId==='chapter-1'&&chapter===0;
  chu.position.set(0,0,adventureId==='chapter-1'?(chapter===0?19:21):45);father.position.set(1.2,0,chu.position.z+1.1);chu.rotation.y=Math.PI;father.rotation.y=Math.PI;adultRigs.get(father).previous.copy(father.position);adultRigs.get(father).blend=0;look.copy(chu.position);renderer.setClearColor(stageInfo().color||0xa4ccd2);scene.fog.color.setHex(stageInfo().color||0xa4ccd2);hemi.intensity=2.3;sun.intensity=3;
- if(adventureId!=='chapter-1'){const built=buildAdventureWorld({world,landscape,ball,box,cyl,mesh,mat,createAdult,cloneDino,movingCreatures,birds},adventureId,stageInfo());ranger=built.ranger;du=createAdult(0xb7758f);du.scale.setScalar(.75);du.position.set(-1,0,46);world.add(du);box(du,0x6c5482,0,1.6,-.4,.58,.6,.22);setupAdventureTasks();quest();$('notice').classList.remove('visible');return;}
+ if(adventureId!=='chapter-1'){const built=buildAdventureWorld({world,landscape,ball,box,cyl,mesh,mat,createAdult,cloneDino,movingCreatures,birds},adventureId,stageInfo());ranger=built.ranger;du=createAdult(0xb7758f);du.scale.setScalar(.75);du.position.set(-1,0,46);world.add(du);box(du,0x6c5482,0,1.6,-.4,.58,.6,.22);setupAdventureTasks();prepareTerrain();quest();$('notice').classList.remove('visible');return;}
  if(chapter===0)setupForest();if(chapter===1){buildCave();setupCave();}if(chapter===2){buildValley();setupValley();}if(chapter===3){buildMountain();setupMountain();}
- quest();$('notice').classList.remove('visible');
+ prepareTerrain();quest();$('notice').classList.remove('visible');
 }
 function setupForest(){
  const berryGroup=new T.Group();berryGroup.position.set(-3.3,0,15.5);world.add(berryGroup);ball(berryGroup,0x668b48,0,.5,0,.8,.7,.6);for(let i=0;i<6;i++)ball(berryGroup,0x915a92,Math.sin(i*2)*.5,.7+(i%2)*.2,Math.cos(i*2)*.4,.12);
@@ -295,14 +296,32 @@ function finishAdventureStage(){if(!allDone()){toast('Còn những điểm sáng
 function nearest(){return items.filter(i=>!completed.has(i.id)&&Math.hypot(chu.position.x-i.x,chu.position.z-i.z)<i.range).sort((a,b)=>Math.hypot(chu.position.x-a.x,chu.position.z-a.z)-Math.hypot(chu.position.x-b.x,chu.position.z-b.z))[0]||null;}
 function act(){if(state!=='play')return;target=nearest();if(target)target.run();}
 function legal(x,z){
- if(adventureId!=='chapter-1'){if(Math.abs(x)>13.4||z<-47||z>48)return false;if(stageInfo().theme==='bridge'&&Math.abs(z)<4.5&&(Math.abs(x)>3||!completed.has('cross')))return false;return true;}
- if(x<-20||x>20||z<-23||z>24)return false;
- if(chapter===0){if(Math.abs(z)<2.1&&(!bridge||Math.abs(x)>.9))return false;return !forestBlockers.some(b=>Math.hypot(x-b.x,z-b.z)<b.r+.27);}
- if(chapter===1){if(Math.abs(x)>5.9||z<-19.5)return false;if(z<14&&!completed.has('pack'))return false;if(z<2.5&&!completed.has('lamp'))return false;return true;}
- if(chapter===2){if(x<-4.8||x>3.25&&z<9&&z>-9)return false;if(Math.hypot(x-9,z-1)<6)return false;return true;}
- if(chapter===3){if(Math.abs(x)>5.2||z<-17.2)return false;if(z<12&&!completed.has('rest'))return false;if(z<5.5&&!completed.has('weather'))return false;if(z<-3&&!completed.has('shelter'))return false;return true;}
+ if(!Number.isFinite(x)||!Number.isFinite(z)||terrainCollisions.blocked(x,z))return false;
+ if(adventureId!=='chapter-1'){
+  if(!insideMeadow(x,z))return false;
+  const theme=stageInfo().theme,riverSide=['river','bridge'].includes(theme),center=riverSide?23+Math.sin(z*.055)*5:39+Math.sin(z*.05)*8;
+  if(Math.abs(z)<=80&&Math.abs(x-center)<3.6)return false;
+  if(theme==='bridge'&&Math.abs(z)<4.5&&(Math.abs(x)>3||!completed.has('cross')))return false;
+  // Enclosures are local islands with a wide route around them.
+  if(['sauropod','horned','armored','museum'].includes(theme)&&Math.abs(z)<45&&((x>15&&x<34)||(x<-13&&x>-33)))return false;
+  if(theme==='fossil'&&Math.hypot(x+22,z)<8)return false;
+  return true;
+ }
+ if(chapter===1){if(Math.abs(x)>5.9||z<-19.5||z>24)return false;if(z<14&&!completed.has('pack'))return false;if(z<2.5&&!completed.has('lamp'))return false;return true;}
+ if(!insideMeadow(x,z))return false;
+ if(chapter===0){const riverZ=Math.abs(x)<12?0:Math.sin((Math.abs(x)-12)*.045)*5;if(Math.abs(z-riverZ)<2.1&&(!bridge||Math.abs(x)>.9))return false;return true;}
+ if(chapter===2){if(x>-24&&x<-5&&z>-22&&z<24)return false;if(Math.hypot((x-9)/6,(z-1)/8.5)<1)return false;return true;}
+ if(chapter===3){if(z<-18)return false;if(z<12&&!completed.has('rest'))return false;if(z<5.5&&!completed.has('weather'))return false;if(z<-3&&!completed.has('shelter'))return false;return true;}
  return true;
 }
+function prepareTerrain(){
+ if(adventureId==='chapter-1'&&chapter!==1)addMeadow({mesh,ball,cyl,mat},world);
+ terrainCollisions.rebuild(adventureId==='chapter-1'&&chapter===0?[...forestNodes,world]:[world]);
+ followTrail=[{x:chu.position.x,z:chu.position.z}];scene.fog.near=chapter===1&&adventureId==='chapter-1'?35:90;scene.fog.far=chapter===1&&adventureId==='chapter-1'?95:240;
+}
+function trailPoint(distance){let left=distance;for(let i=followTrail.length-1;i>0;i--){const a=followTrail[i],b=followTrail[i-1],d=Math.hypot(a.x-b.x,a.z-b.z);if(d>=left&&d>0){const t=left/d;return {x:a.x+(b.x-a.x)*t,z:a.z+(b.z-a.z)*t};}left-=d;}return followTrail[0];}
+function followFootsteps(character,distance,dt,time){const p=trailPoint(distance);if(!p)return;const dx=p.x-character.position.x,dz=p.z-character.position.z;if(Math.hypot(dx,dz)>.001)character.rotation.y=Math.atan2(dx,dz);character.position.set(p.x,chu.position.y,p.z);animateAdult(character,dt,time);}
+
 function pause(){if(state==='play'){state='paused';dialog('NGHỈ CHÂN MỘT CHÚT','Rừng vẫn chờ Chu.','Đăng nhập Google để lưu hành trình. Nếu chơi khách, đóng hoặc tải lại trang sẽ mất tiến trình.',[{label:'Tiếp tục hành trình',run:resume},{label:'Mở nhật ký',run:()=>{state='paused';journal();}},{label:'Chơi lại từ đầu',run:confirmRestart}]);$('pause').textContent='▶';}}
 $('start').onclick=()=>{initAudio();primaryAction?.();};$('secondary').onclick=()=>secondaryAction?.();$('pause').onclick=pause;$('journal').onclick=()=>journal();$('hint').onclick=()=>{if(state==='play')hint();};$('interact').onclick=act;$('touchAction').onclick=act;
 $('sound').onclick=()=>{soundOn=!soundOn;if(soundOn)initAudio();audio?.setEnabled(soundOn);soundButton();};soundButton();
@@ -314,7 +333,7 @@ window.addEventListener('keydown',e=>{if($('donation').open||$('accountPanel').o
 });window.addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));window.addEventListener('blur',()=>{keys.clear();release();pause();audio?.setFocused(false);});document.addEventListener('visibilitychange',()=>{audio?.setFocused(!document.hidden);if(document.hidden){keys.clear();release();pause();}});
 const stick=$('stick');function stickMove(e){const r=stick.getBoundingClientRect();let x=e.clientX-r.left-r.width/2,y=e.clientY-r.top-r.height/2;const len=Math.hypot(x,y);if(len>38){x*=38/len;y*=38/len;}joy.x=x/38;joy.y=y/38;$('knob').style.transform=`translate(${x}px,${y}px)`;}
 stick.addEventListener('pointerdown',e=>{if(state!=='play')return;stickId=e.pointerId;stick.setPointerCapture(e.pointerId);stickMove(e);});stick.addEventListener('pointermove',e=>{if(e.pointerId===stickId)stickMove(e);});stick.addEventListener('pointerup',release);stick.addEventListener('pointercancel',release);
-function resize(){const w=innerWidth,h=innerHeight,aspect=w/h,halfH=w<700?11:13;camera.left=-halfH*aspect;camera.right=halfH*aspect;camera.top=halfH;camera.bottom=-halfH;camera.updateProjectionMatrix();renderer.setSize(w,h);}window.addEventListener('resize',resize);resize();
+function resize(){const w=innerWidth,h=innerHeight;camera.aspect=w/h;camera.fov=w<700?65:55;camera.updateProjectionMatrix();renderer.setSize(w,h);}window.addEventListener('resize',resize);resize();
 renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();$('errorText').textContent='Khu rừng cần tải lại. Phần chưa đồng bộ có thể bị mất.';$('error').hidden=false;});
 let beforeDonation;
 setupDonation({onOpen:()=>{beforeDonation=state;state='donate';keys.clear();release();},onClose:()=>{state=beforeDonation;keys.clear();release();}});
@@ -323,22 +342,24 @@ const clock=new T.Clock();function frame(){
  if(state==='donate'||state==='account'){renderer.render(scene,camera);requestAnimationFrame(frame);return;}
  if(state==='play'){
   totalPlay+=dt;let sx=joy.x+(keys.has('d')||keys.has('arrowright')?1:0)-(keys.has('a')||keys.has('arrowleft')?1:0),sy=joy.y+(keys.has('s')||keys.has('arrowdown')?1:0)-(keys.has('w')||keys.has('arrowup')?1:0);const n=Math.hypot(sx,sy);
-  if(n>.08){if(n>1){sx/=n;sy/=n;}const vx=sx*.819+sy*.573,vz=-sx*.573+sy*.819;const nx=chu.position.x+vx*dt*3,nz=chu.position.z+vz*dt*3;let moved=false;if(legal(nx,chu.position.z)){chu.position.x=nx;moved=true;}if(legal(chu.position.x,nz)){chu.position.z=nz;moved=true;}const angle=Math.atan2(vx,vz),delta=T.MathUtils.euclideanModulo(angle-chu.rotation.y+Math.PI,Math.PI*2)-Math.PI;chu.rotation.y+=delta*Math.min(dt*12,1);moving=moved;steps+=dt*10;if(!legal(nx,nz)&&elapsed-lastSafeToast>7){toast('Chu ở trên lối đi cùng bố. Nếu chưa rõ đường, hãy bấm Gợi ý.',4);lastSafeToast=elapsed;}}
+  if(n>.08){if(n>1){sx/=n;sy/=n;}const vx=sx*.819+sy*.573,vz=-sx*.573+sy*.819;const nx=chu.position.x+vx*dt*3,nz=chu.position.z+vz*dt*3;let moved=false;if(legal(nx,chu.position.z)){chu.position.x=nx;moved=true;}if(legal(chu.position.x,nz)){chu.position.z=nz;moved=true;}const angle=Math.atan2(vx,vz),delta=T.MathUtils.euclideanModulo(angle-chu.rotation.y+Math.PI,Math.PI*2)-Math.PI;chu.rotation.y+=delta*Math.min(dt*12,1);moving=moved;steps+=dt*10;if(!legal(nx,nz)&&elapsed-lastSafeToast>7){toast('Phía trước có vật cản hoặc khu vực không được vào. Mình đi vòng cùng bố nhé.',4);lastSafeToast=elapsed;}}
   target=nearest();$('context').style.display=target?'flex':'none';if(target){$('contextText').textContent=target.title;$('interact').textContent=`E · ${target.action}`;$('touchAction').textContent=target.action;}else $('touchAction').textContent='Quan sát';$('touchAction').classList.toggle('ready',!!target);
 
  }
  if(elapsed>noticeUntil)$('notice').classList.remove('visible');
  chu.position.y=T.MathUtils.lerp(chu.position.y,adventureId==='chapter-1'&&chapter===0&&bridge&&Math.abs(chu.position.z)<2.8&&Math.abs(chu.position.x)<1.1?.53:0,Math.min(dt*10,1));body.position.y=moving?Math.sin(steps*2)*.045:Math.sin(time*2)*.02;legs.forEach((l,i)=>l.rotation.x=moving?Math.sin(steps+i*Math.PI)*.6:0);arms.forEach((a,i)=>a.rotation.x=moving?-Math.sin(steps+i*Math.PI)*.48:Math.sin(time*2)*.03);head.rotation.y=moving?0:Math.sin(time*.7)*.08;
- const fatherOffset=adventureId!=='chapter-1'?Math.min(1.1,13-chu.position.x):chapter===0&&Math.abs(chu.position.z)<4?-.1:Math.min(1.1,4.8-chu.position.x);father.position.x=T.MathUtils.lerp(father.position.x,chu.position.x+fatherOffset,Math.min(dt*4,1));father.position.z=T.MathUtils.lerp(father.position.z,chu.position.z+1.2,Math.min(dt*4,1));father.position.y=T.MathUtils.lerp(father.position.y,adventureId==='chapter-1'&&chapter===0&&bridge&&Math.abs(father.position.z)<2.8?.53:0,Math.min(dt*10,1));const fatherRig=adultRigs.get(father),walkDx=father.position.x-fatherRig.previous.x,walkDz=father.position.z-fatherRig.previous.z;if(Math.hypot(walkDx,walkDz)>.001){const direction=Math.atan2(walkDx,walkDz);father.rotation.y+= (T.MathUtils.euclideanModulo(direction-father.rotation.y+Math.PI,Math.PI*2)-Math.PI)*Math.min(dt*8,1);}animateAdult(father,dt,time);
- if(escort&&cart&&ranger){cart.position.set(chu.position.x-.65,0,chu.position.z+3.3);ranger.position.set(chu.position.x-.65,0,chu.position.z+4.65);ranger.rotation.y=chu.rotation.y;}if(ranger)animateAdult(ranger,dt,time,escort);
- if(du){const prev=du.position.clone();du.position.lerp(new T.Vector3(chu.position.x-.8,0,chu.position.z+2.5),Math.min(dt*3,1));if(du.position.distanceTo(prev)>.001)du.rotation.y=Math.atan2(du.position.x-prev.x,du.position.z-prev.z);animateAdult(du,dt,time);}
+ const last=followTrail[followTrail.length-1];if(!last||Math.hypot(chu.position.x-last.x,chu.position.z-last.z)>.08){followTrail.push({x:chu.position.x,z:chu.position.z});if(followTrail.length>1800)followTrail.shift();}
+ followFootsteps(father,1.6,dt,time);
+
+ if(escort&&cart&&ranger){const p=trailPoint(4);cart.position.set(p.x,0,p.z);cart.rotation.y=chu.rotation.y;followFootsteps(ranger,5.4,dt,time);}else if(ranger)animateAdult(ranger,dt,time,escort);
+ if(du)followFootsteps(du,3,dt,time);
  for(const b of birds){b.g.position.set(Math.sin(time*.1+b.phase)*35,13+Math.sin(time*.3+b.phase)*2,Math.cos(time*.1+b.phase)*40);b.g.rotation.y=time*.1+b.phase;for(let i=0;i<2;i++)b.wings[i].rotation.z=Math.sin(time*7+b.phase)*(i?1:-1)*.45;}
  if(chapter===0){trees.forEach(t=>t.g.rotation.z=Math.sin(time*.7+t.phase)*.013);ripples.forEach((r,i)=>r.position.x=-23+i*1.9+Math.sin(time*.8+i)*.4);for(const {g,base} of markers){g.position.y=base+Math.sin(time*2+g.position.z)*.15;g.rotation.y=time*.7;}}
  for(const m of chapterMarkers){m.position.y=1.65+Math.sin(time*2+m.position.z)*.16;m.rotation.y=time*.7;}for(const d of movingCreatures)animateDinosaur(d,dt,time);for(const a of activeDecor)a.glow.intensity=4.8+Math.sin(time*1.7+a.phase)*.25;
  fireflies.forEach(f=>{f.m.position.set(f.x+Math.sin(time*.35+f.p),f.y+Math.sin(time+f.p)*.2,f.z+Math.cos(time*.3+f.p)*.5);});
  if(rainMesh?.visible){const p=rainMesh.geometry.attributes.position;for(let i=0;i<p.count;i++){let y=p.getY(i)-dt*9;if(y<0)y=14;p.setY(i,y);}p.needsUpdate=true;}
  torch.intensity=adventureId==='chapter-1'&&chapter===1&&flashlightOn?7:0;torch.position.set(chu.position.x,1.5,chu.position.z);lightTarget.position.set(chu.position.x+Math.sin(chu.rotation.y)*5,.2,chu.position.z+Math.cos(chu.rotation.y)*5);
- look.lerp(chu.position,1-Math.exp(-dt*4));camera.position.set(look.x+14,24,look.z+20);camera.lookAt(look.x,0,look.z);renderer.render(scene,camera);requestAnimationFrame(frame);
+ look.lerp(chu.position,1-Math.exp(-dt*4));const cave=adventureId==='chapter-1'&&chapter===1;camera.position.set(look.x+16,cave?24:15,look.z+24);camera.lookAt(look.x,cave?0:1.2,look.z);renderer.render(scene,camera);requestAnimationFrame(frame);
 }
 buildChapter();showWelcome();
 let beforeAccount;

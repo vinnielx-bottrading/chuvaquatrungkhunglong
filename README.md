@@ -1,6 +1,6 @@
 # Chu và Quả Trứng Thất Lạc
 
-## Phiên bản 1.7 — Bốn chương khám phá
+## Phiên bản 1.8 — Đồng cỏ rộng và va chạm
 Game khám phá 3D low-poly bằng tiếng Việt, dành cho trẻ chơi cùng phụ huynh. Chu đọc truyện khủng long, nhận ra một ngọn núi quen thuộc, xin phép và cùng bố lên đường. Trẻ tập quan sát, giải câu đố, nhận biết tình huống nguy hiểm và nhờ người lớn hỗ trợ.
 
 Bản 1.7 có 4 chương, mỗi chương 4 chặng. Chương 2–4 chờ chủ game mở trong admin. Nội dung chi tiết nằm trong README_CHAPTERS.md; hướng dẫn nâng cấp ở cuối tài liệu này. Chưa đo thời lượng chơi với trẻ thực tế.
@@ -196,3 +196,11 @@ Cài mới: chạy schema.sql rồi admin-schema.sql; cấu hình Google và quy
 - PostgreSQL mô phỏng: SQL chạy lại, lưu độc lập 4 chương, xung đột phiên bản, cách ly người chơi và quyền admin.
 - Chưa kiểm thử hình ảnh GPU trên trình duyệt thật hoặc Google/Supabase trực tiếp của chủ game. Chủ game nên chơi thử trên máy tính và điện thoại trước khi mở chương cho khách.
 - Mini-game ghép chuỗi đang làm sẽ bắt đầu lại khi tải lại; các nhiệm vụ đã hoàn thành vẫn được lưu. Khách chưa đăng nhập không lưu tiến trình.
+
+## Bản 1.8 — Không gian khám phá và vật cản
+- Các chặng ngoài trời có đồng cỏ với vùng khám phá đường kính khoảng 160–200 đơn vị theo đường biên tự nhiên bất quy tắc, thay cho giới hạn x/z hình chữ nhật. Hang vẫn là không gian hẹp; các chốt giáo dục an toàn, nước và khu động vật vẫn có giới hạn.
+- Thêm cụm rừng, bãi hoa vàng/trắng/tím, thảm cỏ, đồi xa và núi; chuyển camera ngoài trời sang phối cảnh thấp hơn để thấy chiều sâu. Dùng instancing cho cỏ/hoa/cây để giảm số lần vẽ.
+- Đá, thân cây, bảng biển, bàn trưng bày, tường/cột nhà và lan can có va chạm 2D theo vùng chiếm chỗ của mô hình. Chu trượt dọc mép vật cản, không xuyên qua. Không chặn tán cây phía trên đầu.
+- Bố, Du và đoàn hộ tống theo dấu đường Chu đã đi, tránh cách bám thẳng cắt xuyên đá. Vị trí lưu cũ trong vật cản sẽ được thay bằng điểm bắt đầu an toàn của chặng.
+- Giữ nội dung, trạng thái phát hành và dữ liệu Supabase; không cần SQL mới. Chương chưa mở tiếp tục chờ chủ game xuất bản trong admin.
+- Đã kiểm tra logic hành trình và đường tới nhiệm vụ qua mô phỏng Three.js; chưa xác nhận tốc độ khung hình và hình ảnh trên thiết bị thật.
