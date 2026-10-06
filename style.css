@@ -88,3 +88,7 @@ html,body{width:100%;height:100%;overscroll-behavior:none}#game{width:100%;heigh
 @media(max-height:500px) and (orientation:landscape){#game .gameHeader{top:calc(env(safe-area-inset-top,0px) + 8px)}#touch{bottom:calc(env(safe-area-inset-bottom,0px) + 12px)}#context{bottom:calc(env(safe-area-inset-bottom,0px) + 22px);max-width:calc(100vw - 300px)}#notice{bottom:calc(env(safe-area-inset-bottom,0px) + 85px)}#game #gameTools{max-height:calc(100dvh - env(safe-area-inset-top,0px) - 85px)}}
 
 .toolsOpen #touch,.toolsOpen #context{visibility:hidden}@media(max-width:700px){#currentAdventureTitle{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}}
+html #donation{inset:0;margin:auto;width:min(360px,calc(100vw - 32px));max-height:calc(100dvh - 32px)}
+html #donation::backdrop{background:#06251caa;backdrop-filter:blur(4px)}
+#game #gameTools button[hidden],#accountPanel [hidden]{display:none!important}
+#gameTools .menuSettings{grid-column:1/-1;color:#dce6cc;font-size:14px}#gameTools .menuSettings summary{padding:10px;cursor:pointer}#gameTools .menuSettings button{width:100%;margin-top:6px}

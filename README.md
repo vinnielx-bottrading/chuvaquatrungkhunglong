@@ -1,5 +1,20 @@
 # Chu và Quả Trứng Thất Lạc
 
+## Phiên bản 1.11 — Menu gọn, tự lưu và khôi phục chương
+
+- QR ủng hộ mở giữa màn hình bằng hộp thoại; chiều cao giới hạn theo màn hình và cuộn bên trong, không còn neo vào nút ở cuối menu.
+- **Các chương** đưa về trang mở đầu và đầu danh sách. Người đăng nhập tự lưu trước khi về; nếu mất mạng hoặc xung đột, giữ nguyên phiên chơi và hướng dẫn xử lý. Khách chưa đăng nhập vẫn được cảnh báo trước khi bỏ phiên chơi.
+- Tài khoản đã đăng nhập hiện **Tài khoản**, không còn **Đăng nhập / Tiếp tục**. Chọn một chương sẽ tự tiếp tục bản lưu của chương đó. Nếu chưa có bản lưu, bắt đầu mới.
+- Menu chính chỉ còn Tài khoản, Nhật ký, Gợi ý, Ủng hộ. Âm thanh / Toàn màn hình nằm trong mục thu gọn. Bỏ nút về chương và tạm dừng trùng lặp; Escape vẫn tạm dừng.
+- Tài khoản không còn chọn chương, lưu thủ công hay tải bản lưu trong trạng thái bình thường. Các nút xử lý chỉ hiện khi kết nối lỗi hoặc hai bản lưu khác nhau; không tự ghi đè xung đột thiết bị.
+- Trang đầu giữ đủ Chương 1–4. Chương chưa mở hiển thị ngày hẹn (nếu có) và lời nhắn có thể chỉnh trong admin. Trạng thái cũ “Ẩn” nay hiển thị lời hẹn, không cho chơi. Kiểm tra cấu hình mới trước mỗi lần vào chương; mất kết nối thì cho thử lại, không dùng lịch phát hành cũ để mở chơi.
+- Chương 2 đang thiếu trong cấu hình được bổ sung an toàn ở trạng thái **Sắp ra mắt**. Admin cần chọn trạng thái và **Xuất bản vào game** để mở cho người chơi. Không tự mở các chương còn lại.
+- Chương 1–4 không thể xóa khỏi bản nháp. Chương giới thiệu bổ sung được cất vào **Chương đã cất** và khôi phục lại. **Lịch sử xuất bản → Khôi phục riêng** lấy lại nội dung một chương mà không thay các chương khác.
+- Trong lúc lưu / xuất bản, khóa chỉnh sửa để tránh mất thay đổi. Sau xuất bản đọc lại cấu hình công khai để xác nhận chính xác; có thông báo nếu chưa xác nhận được.
+- Không đổi schema, quyền truy cập, thông tin nhận ủng hộ hoặc dữ liệu tiến trình hiện có. Không cần chạy SQL mới. Tải toàn bộ nội dung ZIP lên thư mục gốc GitHub như các bản trước.
+
+Kiểm thử: mô phỏng đủ 16 chặng; menu; khôi phục chương; lịch mở; lưu khi thoát; tiếp tục bản lưu; mất mạng; xung đột và phiên lưu đang xử lý. Chưa kiểm thử trực tiếp Google OAuth hay hiển thị trên iPhone/Android thật trong môi trường này.
+
 ## Phiên bản 1.10 — Icon app và giao diện thống nhất
 
 - Dùng cùng một icon quả trứng cho thanh tiêu đề, favicon, iPhone và Android. Bộ PNG gồm 32, 180, 192, 512 px và icon maskable.

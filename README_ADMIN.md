@@ -1,4 +1,13 @@
-# Quản trị game Chu — 1.7
+# Quản trị game Chu — 1.11
+
+## Khôi phục chương và xuất bản
+
+- Chương 1–4 luôn có trong trình chỉnh sửa. Nếu bản cũ đã xóa Chương 2, bản này bổ sung lại ở trạng thái **Sắp ra mắt**; chọn **Mở** rồi **Xuất bản vào game** khi sẵn sàng.
+- Muốn lấy lại tên, mô tả, âm thanh đã chỉnh trước khi xóa: vào **Lịch sử xuất bản**, tìm phiên bản còn chương đó, bấm **Khôi phục riêng: [tên chương]**. Các chương khác không bị thay đổi. Bản được khôi phục luôn là Sắp ra mắt để tránh vô tình mở chơi.
+- Chương giới thiệu bổ sung có thể **Cất vào mục khôi phục**. Chúng nằm cuối trang Chương trong **Chương đã cất**; lưu bản nháp để giữ thay đổi này.
+- **Lưu nháp** chưa tác động đến người chơi. **Xuất bản vào game** lưu nháp, gửi xuất bản rồi đọc lại bản công khai để xác nhận. Nếu chưa xác nhận được, kiểm tra mạng / tải lại admin trước khi quyết định xuất bản tiếp.
+- Lời hẹn cho mỗi chương nằm ở trường **Lời hẹn khi chưa mở chương**. Chọn **Hẹn lịch mở** và giờ Việt Nam nếu muốn hiện ngày mở tự động. Chương 1–4 vẫn hiện trên trang đầu dù chưa mở. Trạng thái Ẩn cũ nay chỉ ngăn chơi, không giấu thẻ chương.
+- Không cần SQL mới. Không xóa hay ghi đè tiến trình của người chơi khi đổi trạng thái phát hành.
 
 ## Trang quản trị ở đâu?
 Mở trực tiếp `admin.html` cùng thư mục/tên miền với game. Trang người chơi không có liên kết quản trị.
