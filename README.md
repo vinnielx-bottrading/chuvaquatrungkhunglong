@@ -1,5 +1,28 @@
 # Chu và Quả Trứng Thất Lạc
 
+## Phiên bản 1.10 — Icon app và giao diện thống nhất
+
+- Dùng cùng một icon quả trứng cho thanh tiêu đề, favicon, iPhone và Android. Bộ PNG gồm 32, 180, 192, 512 px và icon maskable.
+- Có manifest với chế độ ưu tiên fullscreen; nếu thiết bị không hỗ trợ thì hệ thống tự chuyển sang chế độ được hỗ trợ. Có nút **Toàn màn hình** trong menu khi trình duyệt có Fullscreen API.
+- Trên iPhone, cấu hình web app phủ nền đến mép màn hình, giữ khoảng an toàn cho tai thỏ/Dynamic Island và thanh thao tác. Đồng hồ/pin và hiệu ứng hệ thống vẫn do iOS quyết định; không cam kết ẩn hoàn toàn như app native. Không khóa xoay màn hình.
+- Sửa nguyên nhân menu không nhận chạm: nút menu trước đây thừa hưởng `pointer-events: none` của header. Nút giờ nhận thao tác độc lập. Menu đóng bằng chạm lại, chạm bên ngoài, chọn chức năng hoặc Escape.
+- Thanh trên cùng thống nhất mobile/desktop: icon + tên Chu + tên chương, nút **Các chương**, nút **Menu**. Trạng thái khách/lưu nằm trong menu và không đè lên tên game.
+- Nút **Các chương** dùng cùng luồng lưu/thoát: khách được nhắc đăng nhập hoặc thoát không lưu, tài khoản đã đăng nhập phải lưu thành công hoặc chủ động bỏ bản chưa lưu.
+- Tạm ẩn bảng chặng/nhiệm vụ và nhãn vị trí lớn trên cả mobile và desktop. Gợi ý vẫn ở trong menu; tiến trình và nhật ký vẫn giữ nguyên.
+- Nút Quan sát là nút nhỏ bo tròn, cao tối thiểu 44 px, chữ 14 px; cần điều khiển 96 px. Menu và điều khiển tính cả vùng an toàn khi xoay ngang.
+- Không thêm cache offline; bản này vẫn cần kết nối để mở game và đồng bộ. Không cần SQL mới và không đổi trạng thái mở/khóa chương của admin.
+
+### Cập nhật icon trên điện thoại
+1. Upload toàn bộ nội dung ZIP lên thư mục gốc GitHub/Vercel, gồm `icons/`, `manifest.webmanifest` và `game-shell.js`.
+2. Đóng game cũ, mở lại website để tải bản mới. Nếu icon cũ vẫn là chữ C, gỡ biểu tượng cũ trên màn hình chính và thêm lại từ website đã cập nhật.
+3. iPhone: Safari → Chia sẻ → Thêm vào Màn hình chính. Android: dùng mục Cài đặt ứng dụng/Thêm vào màn hình chính của trình duyệt.
+4. Khách cần lưu bằng Google trước khi đóng phiên hiện tại; không gỡ biểu tượng hoặc tải lại khi còn tiến trình khách muốn giữ.
+
+### Kiểm tra bản 1.10
+Đã kiểm tra cú pháp JS; mô phỏng menu đóng/mở, Escape, chạm ngoài, nút về chương, gợi ý và các nhánh Fullscreen API; kiểm tra manifest, icon, ID giao diện; hồi quy logic 16 chặng. Chưa kiểm chứng cài đặt thật và hiển thị trên Safari iPhone/Chrome Android trong phiên này.
+
+Tài liệu nền tảng: [Apple meta tags](https://developer.apple.com/library/archive/documentation/AppleApplications/Reference/SafariHTMLRef/Articles/MetaTags.html), [Manifest display](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Manifest/Reference/display).
+
 ## Phiên bản 1.9 — Giao diện mobile và thẻ khám phá
 
 - Điện thoại: thanh nhiệm vụ thu gọn; chạm **Nhiệm vụ** để mở mô tả, tiến độ và gợi ý. Các tiện ích nằm trong nút ☰, giữ nguyên đăng nhập, nhật ký, âm thanh, tạm dừng và thoát.

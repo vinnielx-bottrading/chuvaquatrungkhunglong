@@ -1,0 +1,33 @@
+{
+  "id": "./",
+  "name": "Chu — Những chuyến phiêu lưu",
+  "short_name": "Chu",
+  "description": "Cùng Chu khám phá thiên nhiên và thế giới khủng long.",
+  "lang": "vi",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "fullscreen",
+  "background_color": "#183f35",
+  "theme_color": "#183f35",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "icons/chu-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/chu-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/chu-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
