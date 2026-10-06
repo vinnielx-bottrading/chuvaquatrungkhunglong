@@ -1,6 +1,16 @@
 # Chu và Quả Trứng Thất Lạc
 
-## Phiên bản 1.8 — Đồng cỏ rộng và va chạm
+## Phiên bản 1.9 — Giao diện mobile và thẻ khám phá
+
+- Điện thoại: thanh nhiệm vụ thu gọn; chạm **Nhiệm vụ** để mở mô tả, tiến độ và gợi ý. Các tiện ích nằm trong nút ☰, giữ nguyên đăng nhập, nhật ký, âm thanh, tạm dừng và thoát.
+- Dấu vết có điểm sáng và vòng đánh dấu lớn hơn. Ba dấu vết đầu rừng được tăng kích thước.
+- Thẻ khám phá có hình cận cảnh 640 × 480 dựng trực tiếp từ mô hình low-poly trong game, mô tả, hiệu ứng xuất hiện và âm thanh ngắn. Áp dụng dấu chân, lá, vỏ trứng, ba bia biểu tượng, trứng, mẫu trưng bày và các loài khủng long có mô hình.
+- Người chơi chủ động đọc rồi ghi nhật ký/tiếp tục; di chuyển dừng khi bảng đang mở. Hình đã tạo được xem lại từ nhật ký trong phiên chơi. Không lưu ảnh vào database. Bản lưu giữ nội dung và mã khám phá; sau tải lại, ảnh được tạo lại khi mô hình tương ứng có sẵn. Bản lưu cũ vẫn đọc được, nhưng các ghi chú cũ chưa có mã hình.
+- Hình lấy từ mô hình game, mang tính minh họa. Khám phá là quan sát, không khuyến khích mang dấu vết hoặc động vật về.
+- Không cần SQL mới; không thay đổi trạng thái phát hành chương trong admin.
+- Đã kiểm tra cú pháp và mô phỏng 16 chặng, luồng tạo hình và khôi phục tiến trình. Chưa kiểm tra WebGL/hình ảnh trực tiếp trên điện thoại thật.
+
+## Giới thiệu
 Game khám phá 3D low-poly bằng tiếng Việt, dành cho trẻ chơi cùng phụ huynh. Chu đọc truyện khủng long, nhận ra một ngọn núi quen thuộc, xin phép và cùng bố lên đường. Trẻ tập quan sát, giải câu đố, nhận biết tình huống nguy hiểm và nhờ người lớn hỗ trợ.
 
 Bản 1.7 có 4 chương, mỗi chương 4 chặng. Chương 2–4 chờ chủ game mở trong admin. Nội dung chi tiết nằm trong README_CHAPTERS.md; hướng dẫn nâng cấp ở cuối tài liệu này. Chưa đo thời lượng chơi với trẻ thực tế.
